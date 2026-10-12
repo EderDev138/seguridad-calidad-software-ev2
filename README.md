@@ -195,12 +195,12 @@ que no está especificado no se implementa, no se prueba y termina siendo un inc
 
 ## 8. Entrega a AVA
 
-Los documentos exportados a Word están en `entrega/`, con el formato de la pauta: Arial 12
-en títulos, Arial 11 en cuerpo, interlineado 1,5, texto justificado y portada completa.
+Los documentos de `docs/` se entregan en Word con el formato que exige la pauta: Arial 12 en
+títulos, Arial 11 en cuerpo, interlineado 1,5, texto justificado y portada completa con el
+nombre de cada integrante, carrera, sección, docente y fecha.
 
-```bash
-cd entrega && python exportar-a-word.py
-```
+La fuente de verdad de cada documento es su archivo `.md` en `docs/`; las versiones
+exportadas no se versionan, porque son binarios que no admiten revisión por diferencias.
 
 La lista de verificación previa a la entrega está al final de
 [`docs/04_Paso_a_Paso_Reproducir_EV2.md`](docs/04_Paso_a_Paso_Reproducir_EV2.md).

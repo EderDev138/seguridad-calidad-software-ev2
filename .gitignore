@@ -31,12 +31,11 @@ report_json.json
 storage-documentos/
 *.log
 
-# --- Documentos exportados --------------------------------------------
-# Los .docx se generan desde docs/*.md con entrega/exportar-a-word.py.
-# Son binarios: no se pueden revisar en un diff y se regeneran en un
-# segundo. Se versiona el conversor, que si es codigo fuente.
-entrega/*.docx
-entrega/*.pdf
+# --- Documentos exportados para la entrega ----------------------------
+# La carpeta entrega/ contiene las versiones en Word y PDF que se suben a
+# AVA. Son binarios: no se pueden revisar en un diff y se regeneran desde
+# docs/. La fuente de verdad de todo documento es su .md en docs/.
+entrega/
 
 # --- Temporales del generador de la version auditada -------------------
 .reserva-node-modules/

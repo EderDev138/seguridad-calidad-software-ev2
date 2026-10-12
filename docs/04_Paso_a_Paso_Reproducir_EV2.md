@@ -51,8 +51,12 @@ EV2/
 │   ├── medir-rendimiento.mjs                    Latencia y tasa de error bajo carga
 │   ├── v1.0/                                    19 anexos de la versión auditada
 │   └── v1.1/                                    19 anexos de la versión corregida
-└── entrega/                                     Exportaciones para AVA
+└── entrega/                                     Exportaciones a Word (no versionado)
 ```
+
+> `entrega/` no está en el control de versiones: contiene los documentos exportados a Word,
+> que son binarios regenerables desde `docs/`. La fuente de verdad de cada documento es su
+> archivo `.md`.
 
 ---
 
