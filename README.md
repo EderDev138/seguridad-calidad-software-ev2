@@ -5,6 +5,13 @@ Software*, sobre el **Caso B: Cuidarte+** (sistema de exámenes médicos).
 
 **Eder Valdivia · Marcelo Morales** · Sección 003V · Docente: Mauricio Andrés Velásquez Silva
 
+[![Calidad y seguridad](https://github.com/EderDev138/seguridad-calidad-software-ev2/actions/workflows/calidad-y-seguridad.yml/badge.svg?branch=develop)](https://github.com/EderDev138/seguridad-calidad-software-ev2/actions/workflows/calidad-y-seguridad.yml)
+
+El estado del badge corresponde a las cinco puertas automatizadas que se ejecutan en cada
+cambio: formato, análisis estático de seguridad y accesibilidad, pruebas con cobertura,
+escenarios de comportamiento y análisis de dependencias. Verifican la **versión 1.1**; la
+v1.0 contiene defectos deliberados y su resultado se documenta en `evidencias/v1.0/`.
+
 ---
 
 ## 1. Qué se entrega

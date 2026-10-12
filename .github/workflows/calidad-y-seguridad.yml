@@ -1,0 +1,267 @@
+# =====================================================================
+# Cuidarte+ · Puertas de calidad y seguridad
+# Casos CP-CAL-01 y CP-CAL-02 · NFR-SEG-14, NFR-CAL-1 a 5, NFR-TRAZ-1
+#
+# ALCANCE DE ESTE WORKFLOW
+#
+# Ejecuta las cinco puertas que no dependen de servicios externos:
+# formato, analisis estatico, pruebas con cobertura, escenarios de
+# comportamiento y analisis de dependencias.
+#
+# Las cuatro restantes del plan de pruebas —SonarQube, construccion y
+# escaneo de imagen con Trivy, y escaneo dinamico con OWASP ZAP— estan
+# definidas en `codigo/cuidarte-plus-v1.1/.github/workflows/` como diseno
+# de referencia. No se ejecutan aqui porque requieren un servidor de
+# SonarQube, tokens de servicio y un ambiente levantado, cuya
+# indisponibilidad haria fallar el pipeline por una causa ajena a la
+# calidad del codigo. La distincion queda registrada en el informe
+# (seccion 6.2, casos observados).
+#
+# POR QUE SOLO SE VERIFICA LA VERSION 1.1
+#
+# La version 1.0 es la version auditada: contiene 14 defectos
+# deliberados y su funcion es fallar. Someterla a estas puertas
+# produciria un fallo permanente que no informa nada. Su resultado esta
+# documentado en `evidencias/v1.0/`.
+# =====================================================================
+
+name: Calidad y seguridad
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+
+# Permisos minimos: el workflow solo necesita leer el repositorio.
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: '24'
+
+jobs:
+  # ===================================================================
+  # 1. Formato del codigo · NFR-CAL-5
+  # ===================================================================
+  formato:
+    name: Formato del codigo
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: |
+            codigo/cuidarte-plus-v1.1/api/package-lock.json
+            codigo/cuidarte-plus-v1.1/web/package-lock.json
+
+      - name: Instalar dependencias de la API
+        working-directory: codigo/cuidarte-plus-v1.1/api
+        run: npm ci --no-audit --no-fund
+
+      - name: Verificar el formato de la API
+        working-directory: codigo/cuidarte-plus-v1.1/api
+        run: npm run format
+
+      - name: Instalar dependencias de la SPA
+        working-directory: codigo/cuidarte-plus-v1.1/web
+        run: npm ci --no-audit --no-fund
+
+      - name: Verificar el formato de la SPA
+        working-directory: codigo/cuidarte-plus-v1.1/web
+        run: npm run format
+
+  # ===================================================================
+  # 2. Analisis estatico · CP-SAST-01 · NFR-SEG-5, NFR-USAB-1 a 3
+  #
+  # ESLint con eslint-plugin-security en la API y con
+  # eslint-plugin-jsx-a11y en la SPA. La segunda convierte los requisitos
+  # de accesibilidad del ERS en una puerta automatizada y prohibe
+  # dangerouslySetInnerHTML, que fue el vector del XSS detectado en la
+  # version auditada (incidente INC-04).
+  # ===================================================================
+  analisis-estatico:
+    name: Analisis estatico (seguridad y accesibilidad)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: |
+            codigo/cuidarte-plus-v1.1/api/package-lock.json
+            codigo/cuidarte-plus-v1.1/web/package-lock.json
+
+      - name: Instalar dependencias de la API
+        working-directory: codigo/cuidarte-plus-v1.1/api
+        run: npm ci --no-audit --no-fund
+
+      - name: ESLint en la API (reglas de seguridad)
+        working-directory: codigo/cuidarte-plus-v1.1/api
+        run: npm run lint
+
+      - name: Instalar dependencias de la SPA
+        working-directory: codigo/cuidarte-plus-v1.1/web
+        run: npm ci --no-audit --no-fund
+
+      - name: ESLint en la SPA (reglas de accesibilidad)
+        working-directory: codigo/cuidarte-plus-v1.1/web
+        run: npm run lint
+
+  # ===================================================================
+  # 3. Pruebas y cobertura · CP-CAL-01 · NFR-CAL-1
+  #
+  # Los umbrales estan en jest.config.js. Si la cobertura baja del minimo
+  # la etapa falla: la cobertura es una puerta y no un indicador
+  # informativo.
+  # ===================================================================
+  pruebas:
+    name: Pruebas con cobertura
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: codigo/cuidarte-plus-v1.1/api/package-lock.json
+
+      - name: Instalar dependencias
+        working-directory: codigo/cuidarte-plus-v1.1/api
+        run: npm ci --no-audit --no-fund
+
+      - name: Ejecutar las pruebas con cobertura
+        working-directory: codigo/cuidarte-plus-v1.1/api
+        run: npm run test:cov
+
+      - name: Publicar el informe de cobertura como evidencia
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cobertura
+          path: codigo/cuidarte-plus-v1.1/api/coverage/
+          retention-days: 30
+          if-no-files-found: warn
+
+  # ===================================================================
+  # 4. Escenarios de comportamiento · RB-1, RB-2, RB-3
+  #
+  # Escritos en Gherkin en espanol para que las reglas de negocio sean
+  # validables por alguien que no lee codigo.
+  # ===================================================================
+  comportamiento:
+    name: Escenarios BDD (reglas de negocio)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: codigo/cuidarte-plus-v1.1/api/package-lock.json
+
+      - name: Instalar dependencias
+        working-directory: codigo/cuidarte-plus-v1.1/api
+        run: npm ci --no-audit --no-fund
+
+      - name: Ejecutar los escenarios
+        working-directory: codigo/cuidarte-plus-v1.1/api
+        run: npm run test:bdd
+
+  # ===================================================================
+  # 5. Dependencias de terceros · CP-SCA-01 · NFR-CAL-4
+  #
+  # Dos umbrales distintos y deliberados:
+  #  - Produccion: cualquier severidad bloquea. Ese codigo se despliega y
+  #    ejecuta con los privilegios de la aplicacion.
+  #  - Desarrollo: solo bloquean alta y critica. No se despliega, pero
+  #    ejecuta en este pipeline.
+  # ===================================================================
+  dependencias:
+    name: Dependencias de terceros
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: |
+            codigo/cuidarte-plus-v1.1/api/package-lock.json
+            codigo/cuidarte-plus-v1.1/web/package-lock.json
+
+      - name: Instalar dependencias de la API
+        working-directory: codigo/cuidarte-plus-v1.1/api
+        run: npm ci --no-audit --no-fund
+
+      - name: Auditar las dependencias de produccion de la API
+        working-directory: codigo/cuidarte-plus-v1.1/api
+        run: npm audit --omit=dev --audit-level=low
+
+      - name: Auditar todas las dependencias de la API
+        working-directory: codigo/cuidarte-plus-v1.1/api
+        run: npm audit --audit-level=high
+
+      - name: Instalar dependencias de la SPA
+        working-directory: codigo/cuidarte-plus-v1.1/web
+        run: npm ci --no-audit --no-fund
+
+      - name: Auditar las dependencias de produccion de la SPA
+        working-directory: codigo/cuidarte-plus-v1.1/web
+        run: npm audit --omit=dev --audit-level=low
+
+      - name: Auditar todas las dependencias de la SPA
+        working-directory: codigo/cuidarte-plus-v1.1/web
+        run: npm audit --audit-level=high
+
+  # ===================================================================
+  # 6. Resumen · NFR-TRAZ-1
+  #
+  # Vincula cada control con el requisito que verifica, de modo que el
+  # resultado del pipeline se lea como un informe de cumplimiento y no
+  # como una lista de etapas.
+  # ===================================================================
+  resumen:
+    name: Resumen de las puertas
+    runs-on: ubuntu-latest
+    if: always()
+    needs: [formato, analisis-estatico, pruebas, comportamiento, dependencias]
+    steps:
+      - name: Consolidar el resultado
+        run: |
+          {
+            echo "## Puertas de calidad y seguridad · Cuidarte+ v1.1"
+            echo ""
+            echo "| Control | Requisito verificado | Resultado |"
+            echo "|---|---|---|"
+            echo "| Formato del codigo | NFR-CAL-5 | ${{ needs.formato.result }} |"
+            echo "| Analisis estatico | NFR-SEG-5 · NFR-USAB-1 a 3 | ${{ needs.analisis-estatico.result }} |"
+            echo "| Pruebas y cobertura | NFR-CAL-1 | ${{ needs.pruebas.result }} |"
+            echo "| Escenarios BDD | RB-1 · RB-2 · RB-3 | ${{ needs.comportamiento.result }} |"
+            echo "| Dependencias | NFR-CAL-4 | ${{ needs.dependencias.result }} |"
+            echo ""
+            echo "Commit: \`${{ github.sha }}\`"
+            echo ""
+            echo "Las puertas de SonarQube, Trivy y OWASP ZAP estan definidas en"
+            echo "\`codigo/cuidarte-plus-v1.1/.github/workflows/\` y requieren servicios"
+            echo "externos; su estado se documenta en el informe, seccion 6.2."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Fallar si alguna puerta no paso
+        if: ${{ contains(needs.*.result, 'failure') }}
+        run: |
+          echo "::error::Al menos una puerta de calidad no paso. Revise el resumen."
+          exit 1
