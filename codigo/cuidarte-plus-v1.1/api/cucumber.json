@@ -1,0 +1,8 @@
+{
+  "default": {
+    "import": ["tests/bdd/steps/**/*.js"],
+    "paths": ["tests/bdd/features/**/*.feature"],
+    "format": ["summary", "progress-bar"],
+    "formatOptions": { "snippetInterface": "async-await" }
+  }
+}

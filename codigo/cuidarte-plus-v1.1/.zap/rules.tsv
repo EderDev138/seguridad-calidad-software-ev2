@@ -1,0 +1,46 @@
+# =====================================================================
+# Cuidarte+ · Reglas del escaneo baseline de OWASP ZAP (DAST)
+# Caso CP-SEG-08 · NFR-SEG-5, NFR-SEG-10
+#
+# Formato:  <id de regla>  <accion>  <comentario>
+# Acciones: FAIL (hace fallar el escaneo) · WARN (solo informa) · IGNORE
+#
+# Criterio aplicado: se marcan como FAIL las reglas que corresponden a un
+# requisito del ERS, de modo que el resultado del escaneo sea una verificacion
+# del requisito y no una lista de avisos sin consecuencia. El resto queda en
+# WARN para revision manual.
+# =====================================================================
+
+# --- Cabeceras de seguridad (NFR-SEG-10) -----------------------------
+10015	FAIL	Falta Cache-Control en respuestas con datos clinicos
+10020	FAIL	Falta X-Frame-Options (clickjacking)
+10021	FAIL	Falta X-Content-Type-Options (sniffing de contenido)
+10035	FAIL	Falta Strict-Transport-Security (NFR-SEG-1)
+10038	FAIL	Falta Content-Security-Policy (XSS, NFR-SEG-5)
+10063	FAIL	Falta Permissions-Policy
+10098	FAIL	Referrer-Policy ausente o permisiva
+
+# --- Fuga de informacion del servidor (OWASP A05) --------------------
+10036	FAIL	El servidor revela su version en las cabeceras
+10037	FAIL	El servidor revela informacion en las cabeceras de respuesta
+10027	FAIL	Fuga de informacion en comentarios o mensajes de error
+
+# --- Inyeccion y entradas (NFR-SEG-5, OWASP A03) ---------------------
+40012	FAIL	Cross Site Scripting reflejado
+40014	FAIL	Cross Site Scripting persistente
+40018	FAIL	Inyeccion SQL
+40026	FAIL	Cross Site Scripting en el DOM
+
+# --- Sesion y cookies (NFR-SEG-9) ------------------------------------
+10010	FAIL	Cookie sin el atributo HttpOnly
+10011	FAIL	Cookie sin el atributo Secure
+10054	FAIL	Cookie sin el atributo SameSite
+
+# --- Reglas informativas ---------------------------------------------
+# La API es stateless y autentica por cabecera Authorization, no por cookie:
+# la ausencia de token anti-CSRF no aplica a este diseno. Se deja en WARN para
+# que el hallazgo quede visible y justificado en el informe, en vez de
+# ocultarlo con IGNORE.
+10202	WARN	Token anti-CSRF ausente (la API no usa cookies de sesion)
+10096	WARN	Marca de tiempo expuesta
+10109	WARN	Modern Web Application (deteccion informativa de SPA)
