@@ -1,0 +1,22 @@
+=====================================================================
+EVIDENCIA · Cuidarte+ v1.1
+---------------------------------------------------------------------
+Titulo      : Escenarios de comportamiento en lenguaje natural
+Caso        : CP-SEG-01, CP-INT-04
+Requisito   : RB-1, RB-2, RB-3, RF-3.3, RF-5.1
+Fecha        : 2026-10-12 17:32:56 -0300
+Ejecutado por: Eder Valdivia
+Comando      : npm run test:bdd (api)
+=====================================================================
+
+
+> cuidarte-api@1.1.0 test:bdd
+> cross-env NODE_ENV=test cucumber-js
+
+Cannot use 'progress-bar' formatter for output to 'stdout' as not a TTY. Switching to 'progress' formatter.
+..................................
+
+6 scenarios (6 passed)
+34 steps (34 passed)
+0m 5.782s (0m 5.755s executing your code)
+codigo de salida: 0

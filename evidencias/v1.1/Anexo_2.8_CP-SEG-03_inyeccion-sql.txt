@@ -1,0 +1,41 @@
+=====================================================================
+EVIDENCIA · Cuidarte+ v1.1
+---------------------------------------------------------------------
+Titulo      : Inyeccion SQL en el parametro de filtro de la auditoria
+Caso        : CP-SEG-03
+Requisito   : NFR-SEG-5, OWASP A03, Ley 21.663
+Fecha        : 2026-10-12 17:33:13 -0300
+Ejecutado por: Eder Valdivia
+Comando      : revision del codigo + payload contra /auditoria
+=====================================================================
+
+Este hallazgo ilustra por que un plan de pruebas necesita VARIAS
+tecnicas: las pruebas unitarias corren contra el adaptador en memoria,
+que no ejecuta SQL, de modo que no pueden detectarlo. Solo aparece en
+la revision del codigo y en la prueba dinamica contra PostgreSQL.
+
+--- 1. Revision del codigo (SAST / revision manual) ---
+La firma de la inyeccion es una interpolacion dentro de las comillas
+simples del SQL. Con parametros posicionales ($1, $2) eso no existe.
+Se busca interpolacion de variables dentro de cadenas SQL:
+  (sin coincidencias)
+
+Consultas que SI usan parametros posicionales:
+  usos de parametros posicionales: 4
+
+--- 2. Prueba dinamica contra el servicio en ejecucion ---
+Peticion legitima (filtro por una accion existente):
+  GET /auditoria?accion=LOGIN  ->  HTTP 200
+  registros devueltos: 9
+
+Payload de inyeccion (tautologia que deberia ser tratada como texto):
+  GET /auditoria?accion=LOGIN' OR '1'='1  ->  HTTP 200
+  registros devueltos con el payload: 0
+
+Correcto: el payload se trato como un valor literal. La consulta no
+devolvio registros porque no existe ninguna accion con ese nombre,
+que es exactamente el comportamiento esperado de un parametro
+posicional.
+
+Respuesta (primeros 300 caracteres):
+[]

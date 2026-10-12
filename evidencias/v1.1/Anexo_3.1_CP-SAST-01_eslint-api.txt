@@ -1,0 +1,16 @@
+=====================================================================
+EVIDENCIA · Cuidarte+ v1.1
+---------------------------------------------------------------------
+Titulo      : Analisis estatico del codigo de la API
+Caso        : CP-SAST-01
+Requisito   : NFR-SEG-5, NFR-CAL-5, ISO/IEC 25010
+Fecha        : 2026-10-12 17:31:39 -0300
+Ejecutado por: Eder Valdivia
+Comando      : npm run lint (api)
+=====================================================================
+
+
+> cuidarte-api@1.1.0 lint
+> eslint .
+
+codigo de salida: 0

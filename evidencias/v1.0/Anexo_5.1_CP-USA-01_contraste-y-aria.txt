@@ -1,0 +1,47 @@
+=====================================================================
+EVIDENCIA · Cuidarte+ v1.0
+---------------------------------------------------------------------
+Titulo      : Contraste de color y anuncio de mensajes de estado
+Caso        : CP-USA-01
+Requisito   : NFR-USAB-1, NFR-USAB-3, WCAG 2.1 (1.4.3, 1.4.11, 4.1.3), Ley 20.422
+Fecha        : 2026-10-12 17:35:20 -0300
+Ejecutado por: Eder Valdivia
+Comando      : node verificar-contraste.mjs
+=====================================================================
+
+Hoja de estilos analizada: C:/Users/eder_/OneDrive/Desktop/SeguridadSoftware/cuidarte+/EV2/evidencias/../codigo/cuidarte-plus-v1.0/web/src/estilos.css
+
+Umbrales WCAG 2.1 nivel AA:
+  texto normal     >= 4.5:1   (criterio 1.4.3)
+  texto grande     >= 3.0:1   (criterio 1.4.3)
+  componentes UI   >= 3.0:1   (criterio 1.4.11)
+
+ELEMENTO                              FRENTE    FONDO     RATIO    MINIMO  RESULTADO
+----------------------------------------------------------------------------------------
+Texto principal sobre panel           #1c2733   #ffffff   15.14:1  4.5:1   CUMPLE
+Texto principal sobre el fondo        #1c2733   #f4f7fa   14.08:1  4.5:1   CUMPLE
+Texto secundario y pistas de campo    #a8b2bd   #ffffff   2.15:1   4.5:1   INCUMPLE  <-- WCAG 1.4.3
+Borde y foco de los controles         #0b5c8a   #ffffff   7.21:1   3.0:1   CUMPLE
+Mensaje de error                      #f08c84   #fdecea   2.09:1   4.5:1   INCUMPLE  <-- WCAG 1.4.3
+Mensaje de exito                      #7fd1a0   #e8f5ec   1.62:1   4.5:1   INCUMPLE  <-- WCAG 1.4.3
+Mensaje de aviso                      #e0b964   #fdf3e2   1.69:1   4.5:1   INCUMPLE  <-- WCAG 1.4.3
+Borde de campos y paneles             #7e8d9f   #ffffff   3.39:1   3.0:1   CUMPLE
+
+Resultado: 4 par(es) de color INCUMPLEN el umbral de WCAG 2.1 AA.
+
+Impacto: una persona con baja vision no distingue el texto de su fondo.
+El ERS senala expresamente a los adultos mayores como usuarios objetivo
+(NFR-USAB-1), y la Ley 20.422 exige accesibilidad para personas con
+discapacidad. El mensaje de error es el caso mas grave: es justamente la
+informacion que el usuario necesita leer para corregir su accion.
+
+--- Anuncio de mensajes de estado (WCAG 4.1.3) ---
+Archivo: C:/Users/eder_/OneDrive/Desktop/SeguridadSoftware/cuidarte+/EV2/evidencias/../codigo/cuidarte-plus-v1.0/web/src/componentes/Aviso.jsx
+  role="alert" / role="status" : AUSENTE
+  aria-live                    : AUSENTE
+
+INCUMPLE WCAG 4.1.3: el lector de pantalla no anuncia los mensajes.
+Una persona ciega completa el formulario, lo envia, falla, y no
+recibe ninguna senal de que ocurrio un error.
+
+codigo de salida: 0  (1 = hay incumplimientos)

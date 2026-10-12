@@ -1,0 +1,48 @@
+=====================================================================
+EVIDENCIA · Cuidarte+ v1.0
+---------------------------------------------------------------------
+Titulo      : Revocacion de token y hashing de contrasenas
+Caso        : CP-FUN-03, CP-SEG-04
+Requisito   : RF-1.2, NFR-SEG-2, NFR-SEG-9
+Fecha        : 2026-10-12 17:35:25 -0300
+Ejecutado por: Eder Valdivia
+Comando      : curl sobre /auth + consulta a la base
+=====================================================================
+
+--- Revocacion de token en el logout (RF-1.2) ---
+GET /auth/yo con token recien emitido  ->  HTTP 200 (esperado 200)
+POST /auth/logout                      ->  HTTP 200 (esperado 200)
+GET /auth/yo con el MISMO token        ->  HTTP 200 (esperado 401)
+
+El token sigue siendo criptograficamente valido y no ha expirado, de
+modo que este resultado mide unicamente si la revocacion es efectiva.
+HALLAZGO: el token SIGUE SIENDO ACEPTADO despues del logout.
+El cierre de sesion solo descarta el token en el navegador; quien lo
+haya interceptado conserva el acceso hasta que expire. Incumple RF-1.2.
+
+--- Algoritmo declarado en la cabecera del JWT ---
+{"alg":"HS256","typ":"JWT"}
+
+--- Factor de costo de bcrypt en la base de datos (NFR-SEG-2) ---
+ nombre_usuario | prefijo_y_costo | largo 
+----------------+-----------------+-------
+ admin1         | $2b$08$         |    60
+ medico1        | $2b$08$         |    60
+ medico2        | $2b$08$         |    60
+ paciente1      | $2b$08$         |    60
+ paciente2      | $2b$08$         |    60
+ intruso.qa     | $2b$08$         |    60
+(6 rows)
+
+
+Lectura: el prefijo $2b$NN indica el factor de costo. NFR-SEG-2 y
+OWASP exigen un minimo de 12. Ninguna contrasena aparece en claro.
+
+Factor de costo observado en la base: 08
+HALLAZGO: el factor de costo es 08, bajo el minimo 12.
+Cada punto menos duplica la velocidad de un ataque de fuerza bruta
+offline; de 12 a 8 el ataque es unas 16 veces mas rapido.
+Incumple NFR-SEG-2 e ISO/IEC 27001 A.8.24.
+
+--- Verificacion de que la respuesta de login no filtra el hash ---
+Correcto: la respuesta no contiene el hash

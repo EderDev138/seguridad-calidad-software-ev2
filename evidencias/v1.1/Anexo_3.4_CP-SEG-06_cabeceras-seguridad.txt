@@ -1,0 +1,44 @@
+=====================================================================
+EVIDENCIA · Cuidarte+ v1.1
+---------------------------------------------------------------------
+Titulo      : Cabeceras de seguridad en las respuestas HTTP
+Caso        : CP-SEG-06
+Requisito   : NFR-SEG-10, NFR-SEG-1, OWASP A05
+Fecha        : 2026-10-12 17:33:12 -0300
+Ejecutado por: Eder Valdivia
+Comando      : curl -D - http://localhost:3000/api/v1/salud
+=====================================================================
+
+--- Respuesta completa de /salud ---
+HTTP/1.1 200 OK
+Content-Security-Policy: default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'none';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self';upgrade-insecure-requests;connect-src 'self'
+Cross-Origin-Opener-Policy: same-origin
+Cross-Origin-Resource-Policy: same-site
+Origin-Agent-Cluster: ?1
+Referrer-Policy: no-referrer
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+X-Content-Type-Options: nosniff
+X-DNS-Prefetch-Control: off
+X-Download-Options: noopen
+X-Frame-Options: DENY
+X-Permitted-Cross-Domain-Policies: none
+X-XSS-Protection: 0
+Permissions-Policy: geolocation=(), camera=(), microphone=()
+Vary: Origin
+Access-Control-Allow-Credentials: true
+Content-Type: application/json; charset=utf-8
+Content-Length: 78
+ETag: W/"4e-iO9Q491nnLHheDvmOWRqcK8CpdI"
+Date: Mon, 12 Oct 2026 20:33:12 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+
+--- Verificacion cabecera por cabecera ---
+PRESENTE  Content-Security-Policy
+PRESENTE  X-Content-Type-Options
+PRESENTE  X-Frame-Options
+PRESENTE  Strict-Transport-Security
+PRESENTE  Referrer-Policy
+PRESENTE  Permissions-Policy
+AUSENTE   X-Powered-By   (correcto: no revela el framework)

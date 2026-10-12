@@ -1,0 +1,34 @@
+=====================================================================
+EVIDENCIA · Cuidarte+ v1.0
+---------------------------------------------------------------------
+Titulo      : Cabeceras de seguridad en las respuestas HTTP
+Caso        : CP-SEG-06
+Requisito   : NFR-SEG-10, NFR-SEG-1, OWASP A05
+Fecha        : 2026-10-12 17:35:23 -0300
+Ejecutado por: Eder Valdivia
+Comando      : curl -D - http://localhost:3000/api/v1/salud
+=====================================================================
+
+--- Respuesta completa de /salud ---
+HTTP/1.1 200 OK
+X-Powered-By: Express
+Vary: Origin
+Access-Control-Allow-Credentials: true
+RateLimit-Policy: 300;w=60
+RateLimit: limit=300, remaining=294, reset=59
+Content-Type: application/json; charset=utf-8
+Content-Length: 78
+ETag: W/"4e-Zji2NIJa5/xbqCMSrwe1ZR17ZpQ"
+Date: Mon, 12 Oct 2026 20:35:23 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+
+--- Verificacion cabecera por cabecera ---
+AUSENTE   Content-Security-Policy   <-- incumple NFR-SEG-10
+AUSENTE   X-Content-Type-Options   <-- incumple NFR-SEG-10
+AUSENTE   X-Frame-Options   <-- incumple NFR-SEG-10
+AUSENTE   Strict-Transport-Security   <-- incumple NFR-SEG-10
+AUSENTE   Referrer-Policy   <-- incumple NFR-SEG-10
+AUSENTE   Permissions-Policy   <-- incumple NFR-SEG-10
+PRESENTE  X-Powered-By   <-- revela el framework (OWASP A05)

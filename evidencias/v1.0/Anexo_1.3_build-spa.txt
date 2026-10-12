@@ -1,0 +1,26 @@
+=====================================================================
+EVIDENCIA · Cuidarte+ v1.0
+---------------------------------------------------------------------
+Titulo      : Construccion de produccion de la SPA
+Caso        : CP-COMPAT-01
+Requisito   : NFR-COMPAT-1
+Fecha        : 2026-10-12 17:35:21 -0300
+Ejecutado por: Eder Valdivia
+Comando      : npm run build (web)
+=====================================================================
+
+
+> cuidarte-web@1.0.0 build
+> vite build
+
+[36mvite v8.3.4 [32mbuilding client environment for production...[36m[39m
+transforming...
+✓ 22 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   1.08 kB │ gzip:  0.61 kB
+dist/assets/index-CAqE-piA.css    5.28 kB │ gzip:  1.67 kB
+dist/assets/index-Bz3KaPaW.js   237.76 kB │ gzip: 73.97 kB
+
+[32m✓ built in 107ms[39m
+codigo de salida: 0

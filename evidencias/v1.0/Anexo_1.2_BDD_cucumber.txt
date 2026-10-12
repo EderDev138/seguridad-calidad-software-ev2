@@ -1,0 +1,50 @@
+=====================================================================
+EVIDENCIA · Cuidarte+ v1.0
+---------------------------------------------------------------------
+Titulo      : Escenarios de comportamiento en lenguaje natural
+Caso        : CP-SEG-01, CP-INT-04
+Requisito   : RB-1, RB-2, RB-3, RF-3.3, RF-5.1
+Fecha        : 2026-10-12 17:35:08 -0300
+Ejecutado por: Eder Valdivia
+Comando      : npm run test:bdd (api)
+=====================================================================
+
+
+> cuidarte-api@1.0.0 test:bdd
+> cross-env NODE_ENV=test cucumber-js
+
+Cannot use 'progress-bar' formatter for output to 'stdout' as not a TTY. Switching to 'progress' formatter.
+........F-.................F-.....
+
+Failed scenarios:
+  1) Un paciente no puede registrar un examen # tests\bdd\features\examenes.feature:17
+       Entonces la operacion es rechazada por falta de permisos # tests\bdd\steps\examenes.steps.js:133
+           AssertionError [ERR_ASSERTION]: se esperaba que la operacion fuera rechazada
+               at World.<anonymous> (file:///C:/Users/eder_/OneDrive/Desktop/SeguridadSoftware/cuidarte+/EV2/codigo/cuidarte-plus-v1.0/api/tests/bdd/steps/examenes.steps.js:134:10)
+               at Object.run (C:\Users\eder_\OneDrive\Desktop\SeguridadSoftware\cuidarte+\EV2\codigo\cuidarte-plus-v1.0\api\node_modules\@cucumber\cucumber\lib\user_code_runner.js:24:27)
+               at C:\Users\eder_\OneDrive\Desktop\SeguridadSoftware\cuidarte+\EV2\codigo\cuidarte-plus-v1.0\api\node_modules\@cucumber\cucumber\lib\runtime\step_runner.js:31:114
+               at AsyncLocalStorage.run (node:internal/async_local_storage/async_context_frame:63:14)
+               at runInTestCaseScope (C:\Users\eder_\OneDrive\Desktop\SeguridadSoftware\cuidarte+\EV2\codigo\cuidarte-plus-v1.0\api\node_modules\@cucumber\cucumber\lib\runtime\scope\test_case_scope.js:9:26)
+               at Object.run (C:\Users\eder_\OneDrive\Desktop\SeguridadSoftware\cuidarte+\EV2\codigo\cuidarte-plus-v1.0\api\node_modules\@cucumber\cucumber\lib\runtime\step_runner.js:31:63)
+               at async TestCaseRunner.invokeStep (C:\Users\eder_\OneDrive\Desktop\SeguridadSoftware\cuidarte+\EV2\codigo\cuidarte-plus-v1.0\api\node_modules\@cucumber\cucumber\lib\runtime\test_case_runner.js:91:16)
+               at async TestCaseRunner.runStep (C:\Users\eder_\OneDrive\Desktop\SeguridadSoftware\cuidarte+\EV2\codigo\cuidarte-plus-v1.0\api\node_modules\@cucumber\cucumber\lib\runtime\test_case_runner.js:271:26)
+               at async C:\Users\eder_\OneDrive\Desktop\SeguridadSoftware\cuidarte+\EV2\codigo\cuidarte-plus-v1.0\api\node_modules\@cucumber\cucumber\lib\runtime\test_case_runner.js:179:44
+               at async TestCaseRunner.aroundTestStep (C:\Users\eder_\OneDrive\Desktop\SeguridadSoftware\cuidarte+\EV2\codigo\cuidarte-plus-v1.0\api\node_modules\@cucumber\cucumber\lib\runtime\test_case_runner.js:119:32)
+  2) La eliminacion de un examen es logica y queda auditada # tests\bdd\features\examenes.feature:37
+       Y el registro del examen se conserva marcado como eliminado # tests\bdd\steps\examenes.steps.js:172
+           AssertionError [ERR_ASSERTION]: el registro no debe borrarse fisicamente (RF-3.3)
+               at World.<anonymous> (file:///C:/Users/eder_/OneDrive/Desktop/SeguridadSoftware/cuidarte+/EV2/codigo/cuidarte-plus-v1.0/api/tests/bdd/steps/examenes.steps.js:176:10)
+               at Object.run (C:\Users\eder_\OneDrive\Desktop\SeguridadSoftware\cuidarte+\EV2\codigo\cuidarte-plus-v1.0\api\node_modules\@cucumber\cucumber\lib\user_code_runner.js:24:27)
+               at C:\Users\eder_\OneDrive\Desktop\SeguridadSoftware\cuidarte+\EV2\codigo\cuidarte-plus-v1.0\api\node_modules\@cucumber\cucumber\lib\runtime\step_runner.js:31:114
+               at AsyncLocalStorage.run (node:internal/async_local_storage/async_context_frame:63:14)
+               at runInTestCaseScope (C:\Users\eder_\OneDrive\Desktop\SeguridadSoftware\cuidarte+\EV2\codigo\cuidarte-plus-v1.0\api\node_modules\@cucumber\cucumber\lib\runtime\scope\test_case_scope.js:9:26)
+               at Object.run (C:\Users\eder_\OneDrive\Desktop\SeguridadSoftware\cuidarte+\EV2\codigo\cuidarte-plus-v1.0\api\node_modules\@cucumber\cucumber\lib\runtime\step_runner.js:31:63)
+               at async TestCaseRunner.invokeStep (C:\Users\eder_\OneDrive\Desktop\SeguridadSoftware\cuidarte+\EV2\codigo\cuidarte-plus-v1.0\api\node_modules\@cucumber\cucumber\lib\runtime\test_case_runner.js:91:16)
+               at async TestCaseRunner.runStep (C:\Users\eder_\OneDrive\Desktop\SeguridadSoftware\cuidarte+\EV2\codigo\cuidarte-plus-v1.0\api\node_modules\@cucumber\cucumber\lib\runtime\test_case_runner.js:271:26)
+               at async C:\Users\eder_\OneDrive\Desktop\SeguridadSoftware\cuidarte+\EV2\codigo\cuidarte-plus-v1.0\api\node_modules\@cucumber\cucumber\lib\runtime\test_case_runner.js:179:44
+               at async TestCaseRunner.aroundTestStep (C:\Users\eder_\OneDrive\Desktop\SeguridadSoftware\cuidarte+\EV2\codigo\cuidarte-plus-v1.0\api\node_modules\@cucumber\cucumber\lib\runtime\test_case_runner.js:119:32)
+
+6 scenarios (4 passed, 2 failed)
+34 steps (30 passed, 2 skipped, 2 failed)
+0m 5.843s (0m 5.820s executing your code)
+codigo de salida: 1

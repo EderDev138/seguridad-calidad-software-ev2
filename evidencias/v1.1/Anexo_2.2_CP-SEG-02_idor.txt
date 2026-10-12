@@ -1,0 +1,22 @@
+=====================================================================
+EVIDENCIA · Cuidarte+ v1.1
+---------------------------------------------------------------------
+Titulo      : Un paciente no accede a la informacion clinica de otro
+Caso        : CP-SEG-02
+Requisito   : RB-1, NFR-SEG-4, OWASP A01, Ley 19.628
+Fecha        : 2026-10-12 17:33:13 -0300
+Ejecutado por: Eder Valdivia
+Comando      : curl con token de paciente1 sobre recursos de paciente2
+=====================================================================
+
+paciente1 esta vinculado a la ficha id=1; paciente2 a la ficha id=2.
+
+OPERACION                                                  OBTENIDO   ESPERADO
+GET /pacientes/1 (su propia ficha)                         200        200
+GET /pacientes/2 (ficha ajena)                             404        404
+GET /pacientes/1/examenes (propios)                        200        200
+GET /pacientes/2/examenes (ajenos)                         404        404
+
+--- Contenido que recibe paciente1 al listar pacientes ---
+(debe contener UNICAMENTE su propia ficha: minimizacion de datos)
+[{"id":1,"rut":"12345678-5","nombres":"Ana Maria","apellidos":"Perez Soto","fechaNacimiento":"1948-04-22T00:00:00.000Z","telefono":"+56911111111","email":"ana.perez@cuidarte.test","usuarioId":4,"creadoEn":"2026-10-12T20:28:52.109Z","eliminadoEn":null}]

@@ -1,0 +1,28 @@
+=====================================================================
+EVIDENCIA · Cuidarte+ v1.1
+---------------------------------------------------------------------
+Titulo      : No se admiten dos pacientes con el mismo RUT
+Caso        : CP-INT-05
+Requisito   : Integridad de datos, ISO/IEC 25010
+Fecha        : 2026-10-12 17:33:16 -0300
+Ejecutado por: Eder Valdivia
+Comando      : curl POST /pacientes con RUT repetido
+=====================================================================
+
+El paciente con RUT 12345678-5 ya existe en el ambiente.
+
+POST /pacientes con rut="12345678-5"    ->  HTTP 409 (esperado 409)
+POST /pacientes con rut="12.345.678-5"  ->  HTTP 409 (esperado 409)
+
+El segundo caso es el mismo RUT escrito con puntos. Si el sistema
+respondiera 201, la restriccion de unicidad se podria evadir solo
+cambiando el formato de entrada.
+
+--- Estado de la restriccion en la base de datos ---
+      indexname       |                                               indexdef                                                
+----------------------+-------------------------------------------------------------------------------------------------------
+ paciente_usuario_idx | CREATE INDEX paciente_usuario_idx ON public.paciente USING btree (usuario_id)
+ paciente_rut_uk      | CREATE UNIQUE INDEX paciente_rut_uk ON public.paciente USING btree (rut) WHERE (eliminado_en IS NULL)
+ paciente_pkey        | CREATE UNIQUE INDEX paciente_pkey ON public.paciente USING btree (id)
+(3 rows)
+

@@ -1,0 +1,42 @@
+=====================================================================
+EVIDENCIA · Cuidarte+ v1.1
+---------------------------------------------------------------------
+Titulo      : Revocacion de token y hashing de contrasenas
+Caso        : CP-FUN-03, CP-SEG-04
+Requisito   : RF-1.2, NFR-SEG-2, NFR-SEG-9
+Fecha        : 2026-10-12 17:33:14 -0300
+Ejecutado por: Eder Valdivia
+Comando      : curl sobre /auth + consulta a la base
+=====================================================================
+
+--- Revocacion de token en el logout (RF-1.2) ---
+GET /auth/yo con token recien emitido  ->  HTTP 200 (esperado 200)
+POST /auth/logout                      ->  HTTP 200 (esperado 200)
+GET /auth/yo con el MISMO token        ->  HTTP 401 (esperado 401)
+
+El token sigue siendo criptograficamente valido y no ha expirado, de
+modo que este resultado mide unicamente si la revocacion es efectiva.
+Correcto: la revocacion opera en el servidor y no solo en el cliente.
+
+--- Algoritmo declarado en la cabecera del JWT ---
+{"alg":"HS256","typ":"JWT"}
+
+--- Factor de costo de bcrypt en la base de datos (NFR-SEG-2) ---
+ nombre_usuario | prefijo_y_costo | largo 
+----------------+-----------------+-------
+ admin1         | $2b$12$         |    60
+ medico1        | $2b$12$         |    60
+ medico2        | $2b$12$         |    60
+ paciente1      | $2b$12$         |    60
+ paciente2      | $2b$12$         |    60
+(5 rows)
+
+
+Lectura: el prefijo $2b$NN indica el factor de costo. NFR-SEG-2 y
+OWASP exigen un minimo de 12. Ninguna contrasena aparece en claro.
+
+Factor de costo observado en la base: 12
+Correcto: el factor cumple el minimo exigido por NFR-SEG-2.
+
+--- Verificacion de que la respuesta de login no filtra el hash ---
+Correcto: la respuesta no contiene el hash

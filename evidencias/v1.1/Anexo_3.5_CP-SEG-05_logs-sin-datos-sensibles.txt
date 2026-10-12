@@ -1,0 +1,37 @@
+=====================================================================
+EVIDENCIA · Cuidarte+ v1.1
+---------------------------------------------------------------------
+Titulo      : El registro del servicio no contiene credenciales ni datos clinicos
+Caso        : CP-SEG-05
+Requisito   : NFR-SEG-6, NFR-SEG-15, Ley 19.628/21.719
+Fecha        : 2026-10-12 17:33:19 -0300
+Ejecutado por: Eder Valdivia
+Comando      : docker compose logs api
+=====================================================================
+
+Se provoca un intento de acceso con una contrasena conocida y se busca
+esa contrasena en los logs del servicio.
+
+Correcto: la contrasena NO aparece en los logs.
+
+--- Ultimas lineas del log (para inspeccion) ---
+api-1  | {"level":40,"time":"2026-10-12T20:33:16.794Z","pid":7,"hostname":"3ff36c9ab382","codigo":"DUPLICADO","ruta":"/api/v1/pacientes","msg":"Paciente ya existe con RUT: 12345678-5"}
+api-1  | {"level":40,"time":"2026-10-12T20:33:16.794Z","pid":7,"hostname":"3ff36c9ab382","req":{"metodo":"POST","url":"/api/v1/pacientes","ip":"::ffff:172.22.0.1"},"res":{"status":409},"responseTime":2,"msg":"request completed"}
+api-1  | {"level":40,"time":"2026-10-12T20:33:16.848Z","pid":7,"hostname":"3ff36c9ab382","codigo":"DUPLICADO","ruta":"/api/v1/pacientes","msg":"Paciente ya existe con RUT: 12345678-5"}
+api-1  | {"level":40,"time":"2026-10-12T20:33:16.848Z","pid":7,"hostname":"3ff36c9ab382","req":{"metodo":"POST","url":"/api/v1/pacientes","ip":"::ffff:172.22.0.1"},"res":{"status":409},"responseTime":3,"msg":"request completed"}
+api-1  | {"level":30,"time":"2026-10-12T20:33:17.421Z","pid":7,"hostname":"3ff36c9ab382","req":{"metodo":"GET","url":"/api/v1/salud","ip":"::ffff:127.0.0.1"},"res":{"status":200},"responseTime":0,"msg":"request completed"}
+api-1  | {"level":30,"time":"2026-10-12T20:33:18.005Z","pid":7,"hostname":"3ff36c9ab382","req":{"metodo":"GET","url":"/api/v1/auditoria?limite=12","ip":"::ffff:172.22.0.1"},"res":{"status":200},"responseTime":2,"msg":"request completed"}
+api-1  | {"level":30,"time":"2026-10-12T20:33:18.127Z","pid":7,"hostname":"3ff36c9ab382","req":{"metodo":"POST","url":"/api/v1/examenes","ip":"::ffff:172.22.0.1"},"res":{"status":201},"responseTime":9,"msg":"request completed"}
+api-1  | {"level":30,"time":"2026-10-12T20:33:18.200Z","pid":7,"hostname":"3ff36c9ab382","req":{"metodo":"DELETE","url":"/api/v1/examenes/14","ip":"::ffff:172.22.0.1"},"res":{"status":200},"responseTime":5,"msg":"request completed"}
+api-1  | {"level":40,"time":"2026-10-12T20:33:18.253Z","pid":7,"hostname":"3ff36c9ab382","codigo":"NO_ENCONTRADO","ruta":"/api/v1/examenes/14","msg":"Examen no encontrado: 14"}
+api-1  | {"level":40,"time":"2026-10-12T20:33:18.253Z","pid":7,"hostname":"3ff36c9ab382","req":{"metodo":"GET","url":"/api/v1/examenes/14","ip":"::ffff:172.22.0.1"},"res":{"status":404},"responseTime":2,"msg":"request completed"}
+api-1  | {"level":30,"time":"2026-10-12T20:33:18.690Z","pid":7,"hostname":"3ff36c9ab382","req":{"metodo":"POST","url":"/api/v1/examenes","ip":"::ffff:172.22.0.1"},"res":{"status":201},"responseTime":8,"msg":"request completed"}
+api-1  | {"level":30,"time":"2026-10-12T20:33:18.980Z","pid":7,"hostname":"3ff36c9ab382","req":{"metodo":"POST","url":"/api/v1/examenes/15/documentos","ip":"::ffff:172.22.0.1"},"res":{"status":201},"responseTime":12,"msg":"request completed"}
+api-1  | {"level":40,"time":"2026-10-12T20:33:19.024Z","pid":7,"hostname":"3ff36c9ab382","codigo":"DATOS_INVALIDOS","ruta":"/api/v1/examenes/15/documentos","msg":"El contenido del archivo no corresponde al tipo declarado (application/pdf)"}
+api-1  | {"level":40,"time":"2026-10-12T20:33:19.024Z","pid":7,"hostname":"3ff36c9ab382","req":{"metodo":"POST","url":"/api/v1/examenes/15/documentos","ip":"::ffff:172.22.0.1"},"res":{"status":400},"responseTime":3,"msg":"request completed"}
+api-1  | {"level":40,"time":"2026-10-12T20:33:19.068Z","pid":7,"hostname":"3ff36c9ab382","codigo":"DATOS_INVALIDOS","ruta":"/api/v1/examenes/15/documentos","msg":"Tipo de archivo no permitido: text/html"}
+api-1  | {"level":40,"time":"2026-10-12T20:33:19.069Z","pid":7,"hostname":"3ff36c9ab382","req":{"metodo":"POST","url":"/api/v1/examenes/15/documentos","ip":"::ffff:172.22.0.1"},"res":{"status":400},"responseTime":2,"msg":"request completed"}
+api-1  | {"level":40,"time":"2026-10-12T20:33:19.117Z","pid":7,"hostname":"3ff36c9ab382","codigo":"NO_AUTORIZADO","ruta":"/api/v1/examenes/15/documentos","msg":"El rol PACIENTE no puede realizar esta operacion. Roles permitidos: ADMIN, MEDICO"}
+api-1  | {"level":40,"time":"2026-10-12T20:33:19.117Z","pid":7,"hostname":"3ff36c9ab382","req":{"metodo":"POST","url":"/api/v1/examenes/15/documentos","ip":"::ffff:172.22.0.1"},"res":{"status":403},"responseTime":1,"msg":"request completed"}
+api-1  | {"level":40,"time":"2026-10-12T20:33:19.485Z","pid":7,"hostname":"3ff36c9ab382","codigo":"NO_AUTENTICADO","ruta":"/api/v1/auth/login","msg":"Credenciales invalidas"}
+api-1  | {"level":40,"time":"2026-10-12T20:33:19.485Z","pid":7,"hostname":"3ff36c9ab382","req":{"metodo":"POST","url":"/api/v1/auth/login","ip":"::ffff:172.22.0.1"},"res":{"status":401},"responseTime":254,"msg":"request completed"}

@@ -1,0 +1,32 @@
+=====================================================================
+EVIDENCIA · Cuidarte+ v1.0
+---------------------------------------------------------------------
+Titulo      : Resistencia a SQLi, XSS almacenado y mass assignment
+Caso        : CP-SEG-03
+Requisito   : NFR-SEG-5, OWASP A01/A03
+Fecha        : 2026-10-12 17:35:25 -0300
+Ejecutado por: Eder Valdivia
+Comando      : curl con payloads de inyeccion
+=====================================================================
+
+--- SQL Injection en el campo RUT ---
+POST /pacientes con rut="12345678-5'; DROP TABLE paciente;--"  ->  HTTP 400 (esperado 400)
+GET /pacientes (comprobar que la tabla sigue operativa)           ->  HTTP 200 (esperado 200)
+
+--- Escalada de privilegios por mass assignment ---
+POST /auth/registro con {"rol":"ADMIN"}  ->  HTTP 201 (esperado 400)
+
+--- XSS almacenado: se guarda un payload y se recupera ---
+Respuesta al crear:
+{"id":9,"pacienteId":1,"tipo":"Prueba XSS","descripcion":"<script>alert(1)</script>","fechaExamen":null,"medicoId":2,"estado":"PENDIENTE","creadoEn":"2026-10-12T20:35:25.323Z","eliminadoEn":null}
+
+El valor se devuelve como dato JSON y no como documento HTML.
+Content-Type de la respuesta:
+Content-Type: application/json; charset=utf-8
+
+La defensa de renderizado esta en la SPA: se verifica que el codigo
+(se busca el uso del atributo, con su llave de apertura: mencionarlo en
+ un comentario no cuenta como uso)
+fuente del frontend no use dangerouslySetInnerHTML.
+/c/Users/eder_/OneDrive/Desktop/SeguridadSoftware/cuidarte+/EV2/evidencias/../codigo/cuidarte-plus-v1.0/web/src/componentes/Examenes.jsx:199:            dangerouslySetInnerHTML={{
+HALLAZGO: se encontro dangerouslySetInnerHTML  <-- vector de XSS (NFR-SEG-5)

@@ -1,0 +1,35 @@
+=====================================================================
+EVIDENCIA · Cuidarte+ v1.0
+---------------------------------------------------------------------
+Titulo      : Analisis estatico del codigo de la API
+Caso        : CP-SAST-01
+Requisito   : NFR-SEG-5, NFR-CAL-5, ISO/IEC 25010
+Fecha        : 2026-10-12 17:33:50 -0300
+Ejecutado por: Eder Valdivia
+Comando      : npm run lint (api)
+=====================================================================
+
+
+> cuidarte-api@1.0.0 lint
+> eslint .
+
+
+C:\Users\eder_\OneDrive\Desktop\SeguridadSoftware\cuidarte+\EV2\codigo\cuidarte-plus-v1.0\api\src\application\usecase\AuthUseCase.js
+  136:23  error  'expiraEn' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
+
+C:\Users\eder_\OneDrive\Desktop\SeguridadSoftware\cuidarte+\EV2\codigo\cuidarte-plus-v1.0\api\src\application\usecase\ExamenUseCase.js
+  25:10  error  '#puedeEscribir' is defined but never used  no-unused-private-class-members
+
+C:\Users\eder_\OneDrive\Desktop\SeguridadSoftware\cuidarte+\EV2\codigo\cuidarte-plus-v1.0\api\src\domain\model\Paciente.js
+  4:10  error  'digitoVerificador' is defined but never used. Allowed unused vars must match /^_/u  no-unused-vars
+
+C:\Users\eder_\OneDrive\Desktop\SeguridadSoftware\cuidarte+\EV2\codigo\cuidarte-plus-v1.0\api\src\infrastructure\entrypoints\rest\middleware\seguridad.js
+  90:7  error  'LIMITE_GENERAL_POR_DEFECTO' is assigned a value but never used. Allowed unused vars must match /^_/u  no-unused-vars
+
+C:\Users\eder_\OneDrive\Desktop\SeguridadSoftware\cuidarte+\EV2\codigo\cuidarte-plus-v1.0\api\src\infrastructure\entrypoints\rest\routes\examenes.routes.js
+  2:10  error  'ROLES' is defined but never used. Allowed unused vars must match /^_/u      no-unused-vars
+  4:10  error  'exigirRol' is defined but never used. Allowed unused vars must match /^_/u  no-unused-vars
+
+✖ 6 problems (6 errors, 0 warnings)
+
+codigo de salida: 1

@@ -1,0 +1,90 @@
+=====================================================================
+EVIDENCIA · Cuidarte+ v1.1
+---------------------------------------------------------------------
+Titulo      : Pruebas unitarias e integracion con cobertura
+Caso        : CP-CAL-01 y todos los CP automatizados
+Requisito   : NFR-CAL-1
+Fecha        : 2026-10-12 17:31:42 -0300
+Ejecutado por: Eder Valdivia
+Comando      : npm run test:cov (api)
+=====================================================================
+
+
+> cuidarte-api@1.1.0 test:cov
+> cross-env NODE_ENV=test node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage
+
+(node:31020) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:31660) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:38024) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:21740) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:22336) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:28608) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+------------------------------------------------|---------|----------|---------|---------|--------------------------------------------------
+File                                            | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s                                
+------------------------------------------------|---------|----------|---------|---------|--------------------------------------------------
+All files                                       |   89.98 |    76.21 |   87.23 |   89.84 |                                                  
+ src                                            |   89.47 |    71.42 |     100 |   89.47 |                                                  
+  app.js                                        |   89.47 |    71.42 |     100 |   89.47 | 91,103                                           
+ src/application/usecase                        |   85.37 |    63.87 |   97.05 |   85.31 |                                                  
+  AuditoriaUseCase.js                           |   88.88 |    83.33 |     100 |   88.88 | 18                                               
+  AuthUseCase.js                                |   94.54 |    71.42 |     100 |   94.54 | 138,155,159                                      
+  DocumentoUseCase.js                           |   67.56 |    46.66 |      80 |   67.56 | 43,48,85,104-121                                 
+  ExamenUseCase.js                              |   92.68 |    65.38 |     100 |   92.68 | 31,47,81                                         
+  PacienteUseCase.js                            |   95.91 |    78.57 |     100 |   95.91 | 27,45                                            
+  UsuarioUseCase.js                             |   74.19 |    51.11 |     100 |   73.77 | 28,45,53,56,59,88,98-102,110,117,120,123-124,147 
+ src/domain/error                               |     100 |       75 |     100 |     100 |                                                  
+  errors.js                                     |     100 |       75 |     100 |     100 | 50                                               
+ src/domain/gateway                             |       0 |      100 |       0 |       0 |                                                  
+  gateways.js                                   |       0 |      100 |       0 |       0 | 14-141                                           
+ src/domain/model                               |   99.15 |    92.77 |     100 |   99.13 |                                                  
+  Documento.js                                  |     100 |      100 |     100 |     100 |                                                  
+  Examen.js                                     |     100 |      100 |     100 |     100 |                                                  
+  Paciente.js                                   |   97.43 |    96.29 |     100 |   97.36 | 13                                               
+  RegistroAuditoria.js                          |     100 |    57.14 |     100 |     100 | 10-11,17                                         
+  Usuario.js                                    |     100 |    88.88 |     100 |     100 | 48,53                                            
+  roles.js                                      |     100 |      100 |     100 |     100 |                                                  
+ src/infrastructure/adapters/memory             |     100 |     92.3 |     100 |     100 |                                                  
+  gatewaysMemoria.js                            |     100 |     92.3 |     100 |     100 | 191,241,262                                      
+ src/infrastructure/config                      |     100 |    83.33 |     100 |     100 |                                                  
+  logger.js                                     |     100 |    83.33 |     100 |     100 | 13-46                                            
+ src/infrastructure/entrypoints/rest/middleware |   87.17 |    72.13 |     100 |   87.01 |                                                  
+  autenticacion.js                              |    90.9 |    78.57 |     100 |    90.9 | 31,54                                            
+  errorHandler.js                               |   74.07 |    60.86 |     100 |   74.07 | 24,43-47,64,94,100-101                           
+  seguridad.js                                  |   92.85 |    58.33 |     100 |   92.85 | 69                                               
+  validacion.js                                 |     100 |      100 |     100 |     100 |                                                  
+ src/infrastructure/entrypoints/rest/routes     |   98.05 |    83.33 |   97.29 |   98.03 |                                                  
+  auth.routes.js                                |     100 |      100 |     100 |     100 |                                                  
+  comun.js                                      |     100 |      100 |     100 |     100 |                                                  
+  documentos.routes.js                          |    90.9 |      100 |   66.66 |    90.9 | 50                                               
+  examenes.routes.js                            |   95.45 |       50 |     100 |   95.45 | 86                                               
+  index.js                                      |     100 |      100 |     100 |     100 |                                                  
+  pacientes.routes.js                           |     100 |      100 |     100 |     100 |                                                  
+  usuarios.routes.js                            |     100 |      100 |     100 |     100 |                                                  
+ src/infrastructure/entrypoints/rest/schema     |     100 |      100 |     100 |     100 |                                                  
+  esquemas.js                                   |     100 |      100 |     100 |     100 |                                                  
+ src/infrastructure/security                    |   94.11 |    83.72 |     100 |   94.11 |                                                  
+  password.js                                   |   96.15 |     90.9 |     100 |   96.15 | 18                                               
+  token.js                                      |      92 |    76.19 |     100 |      92 | 26,85                                            
+ src/infrastructure/storage                     |     100 |      100 |     100 |     100 |                                                  
+  StorageLocal.js                               |     100 |      100 |     100 |     100 |                                                  
+------------------------------------------------|---------|----------|---------|---------|--------------------------------------------------
+
+=============================== Coverage summary ===============================
+Statements   : 89.98% ( 746/829 )
+Branches     : 76.21% ( 346/454 )
+Functions    : 87.23% ( 205/235 )
+Lines        : 89.84% ( 734/817 )
+================================================================================
+
+Test Suites: 6 passed, 6 total
+Tests:       132 passed, 132 total
+Snapshots:   0 total
+Time:        72.585 s, estimated 73 s
+Ran all test suites.
+codigo de salida: 0

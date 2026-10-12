@@ -1,0 +1,401 @@
+=====================================================================
+EVIDENCIA · Cuidarte+ v1.0
+---------------------------------------------------------------------
+Titulo      : Pruebas unitarias e integracion con cobertura
+Caso        : CP-CAL-01 y todos los CP automatizados
+Requisito   : NFR-CAL-1
+Fecha        : 2026-10-12 17:33:54 -0300
+Ejecutado por: Eder Valdivia
+Comando      : npm run test:cov (api)
+=====================================================================
+
+
+> cuidarte-api@1.0.0 test:cov
+> cross-env NODE_ENV=test node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage
+
+(node:20328) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:22732) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+FAIL tests/unit/dominio.test.js
+  ● CP-FUN-05 · Normalizacion y validacion del RUT (RB nueva, INC-01) › normaliza formatos equivalentes a la misma forma canonica
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "12345678-5"
+    Received: "12.345.678-5"
+
+    [0m [90m 19 |[39m     [90m// Los tres son el MISMO RUT escrito distinto. Si la normalizacion no los[39m
+     [90m 20 |[39m     [90m// unifica, la restriccion de unicidad se puede evadir cambiando el formato.[39m
+    [31m[1m>[22m[39m[90m 21 |[39m     expect(normalizarRut([32m'12.345.678-5'[39m))[33m.[39mtoBe([32m'12345678-5'[39m)[33m;[39m
+     [90m    |[39m                                           [31m[1m^[22m[39m
+     [90m 22 |[39m     expect(normalizarRut([32m'12345678-5'[39m))[33m.[39mtoBe([32m'12345678-5'[39m)[33m;[39m
+     [90m 23 |[39m     expect(normalizarRut([32m'  12.345.678-5  '[39m))[33m.[39mtoBe([32m'12345678-5'[39m)[33m;[39m
+     [90m 24 |[39m   })[33m;[39m[0m
+
+      at Object.<anonymous> (tests/unit/dominio.test.js:21:43)
+
+  ● CP-FUN-05 · Normalizacion y validacion del RUT (RB nueva, INC-01) › acepta digito verificador K en minuscula y lo normaliza
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "20347024-K"
+    Received: "20.347.024-K"
+
+    [0m [90m 25 |[39m
+     [90m 26 |[39m   test([32m'acepta digito verificador K en minuscula y lo normaliza'[39m[33m,[39m () [33m=>[39m {
+    [31m[1m>[22m[39m[90m 27 |[39m     expect(normalizarRut([32m'20.347.024-k'[39m))[33m.[39mtoBe([32m'20347024-K'[39m)[33m;[39m
+     [90m    |[39m                                           [31m[1m^[22m[39m
+     [90m 28 |[39m   })[33m;[39m
+     [90m 29 |[39m
+     [90m 30 |[39m   test([32m'rechaza un RUT con digito verificador incorrecto'[39m[33m,[39m () [33m=>[39m {[0m
+
+      at Object.<anonymous> (tests/unit/dominio.test.js:27:43)
+
+  ● CP-FUN-05 · Normalizacion y validacion del RUT (RB nueva, INC-01) › rechaza un RUT con digito verificador incorrecto
+
+    expect(received).toThrow(expected)
+
+    Expected constructor: DatosInvalidos
+
+    Received function did not throw
+
+    [0m [90m 29 |[39m
+     [90m 30 |[39m   test([32m'rechaza un RUT con digito verificador incorrecto'[39m[33m,[39m () [33m=>[39m {
+    [31m[1m>[22m[39m[90m 31 |[39m     expect(() [33m=>[39m normalizarRut([32m'12.345.678-9'[39m))[33m.[39mtoThrow([33mDatosInvalidos[39m)[33m;[39m
+     [90m    |[39m                                                 [31m[1m^[22m[39m
+     [90m 32 |[39m   })[33m;[39m
+     [90m 33 |[39m
+     [90m 34 |[39m   test([32m'rechaza un RUT con formato invalido o ausente'[39m[33m,[39m () [33m=>[39m {[0m
+
+      at Object.<anonymous> (tests/unit/dominio.test.js:31:49)
+
+  ● CP-FUN-05 · Normalizacion y validacion del RUT (RB nueva, INC-01) › rechaza un RUT con formato invalido o ausente
+
+    expect(received).toThrow(expected)
+
+    Expected constructor: DatosInvalidos
+
+    Received function did not throw
+
+    [0m [90m 33 |[39m
+     [90m 34 |[39m   test([32m'rechaza un RUT con formato invalido o ausente'[39m[33m,[39m () [33m=>[39m {
+    [31m[1m>[22m[39m[90m 35 |[39m     expect(() [33m=>[39m normalizarRut([32m'no-es-un-rut'[39m))[33m.[39mtoThrow([33mDatosInvalidos[39m)[33m;[39m
+     [90m    |[39m                                                 [31m[1m^[22m[39m
+     [90m 36 |[39m     expect(() [33m=>[39m normalizarRut(undefined))[33m.[39mtoThrow([33mDatosInvalidos[39m)[33m;[39m
+     [90m 37 |[39m     expect(() [33m=>[39m normalizarRut([32m'123-5'[39m))[33m.[39mtoThrow([33mDatosInvalidos[39m)[33m;[39m
+     [90m 38 |[39m   })[33m;[39m[0m
+
+      at Object.<anonymous> (tests/unit/dominio.test.js:35:49)
+
+  ● CP-FUN-05 · Normalizacion y validacion del RUT (RB nueva, INC-01) › el paciente normaliza su RUT al validarse
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "12345678-5"
+    Received: "12.345.678-5"
+
+    [0m [90m 44 |[39m       apellidos[33m:[39m [32m'Perez'[39m[33m,[39m
+     [90m 45 |[39m     })[33m.[39mvalidar()[33m;[39m
+    [31m[1m>[22m[39m[90m 46 |[39m     expect(paciente[33m.[39mrut)[33m.[39mtoBe([32m'12345678-5'[39m)[33m;[39m
+     [90m    |[39m                          [31m[1m^[22m[39m
+     [90m 47 |[39m     expect(paciente[33m.[39mnombreCompleto)[33m.[39mtoBe([32m'Ana Perez'[39m)[33m;[39m
+     [90m 48 |[39m   })[33m;[39m
+     [90m 49 |[39m[0m
+
+      at Object.<anonymous> (tests/unit/dominio.test.js:46:26)
+
+(node:22460) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:38204) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:35932) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:22388) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+FAIL tests/integration/autenticacion.test.js (8.225 s)
+  ● CP-FUN-03 · Cierre de sesion y revocacion de token (RF-1.2, NFR-SEG-9) › tras el logout el mismo token deja de ser valido
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 401
+    Received: 200
+
+    [0m [90m 154 |[39m       [33m.[39m[36mget[39m([32m'/api/v1/auth/yo'[39m)
+     [90m 155 |[39m       [33m.[39m[36mset[39m([32m'Authorization'[39m[33m,[39m [32m`Bearer ${token}`[39m)[33m;[39m
+    [31m[1m>[22m[39m[90m 156 |[39m     expect(despues[33m.[39mstatus)[33m.[39mtoBe([35m401[39m)[33m;[39m
+     [90m     |[39m                            [31m[1m^[22m[39m
+     [90m 157 |[39m   })[33m;[39m
+     [90m 158 |[39m
+     [90m 159 |[39m   test([32m'rechaza peticiones sin token o con token manipulado'[39m[33m,[39m [36masync[39m () [33m=>[39m {[0m
+
+      at Object.<anonymous> (tests/integration/autenticacion.test.js:156:28)
+
+  ● CP-FUN-04 · Autorregistro con rol por defecto (RF-2.1, RB-1) › NO permite escalar privilegios enviando el campo rol (OWASP A01)
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 400
+    Received: 201
+
+    [0m [90m 210 |[39m     })[33m;[39m
+     [90m 211 |[39m
+    [31m[1m>[22m[39m[90m 212 |[39m     expect(respuesta[33m.[39mstatus)[33m.[39mtoBe([35m400[39m)[33m;[39m
+     [90m     |[39m                              [31m[1m^[22m[39m
+     [90m 213 |[39m     expect([36mawait[39m entorno[33m.[39mgateways[33m.[39musuarioGateway[33m.[39mobtenerPorNombreUsuario([32m'atacante'[39m))[33m.[39mtoBeNull()[33m;[39m
+     [90m 214 |[39m   })[33m;[39m
+     [90m 215 |[39m[0m
+
+      at Object.<anonymous> (tests/integration/autenticacion.test.js:212:30)
+
+  ● CP-SEG-06 · Cabeceras de seguridad HTTP (NFR-SEG-10) › toda respuesta incluye las cabeceras que verifica OWASP ZAP
+
+    expect(received).toContain(expected) // indexOf
+
+    Matcher error: received value must not be null nor undefined
+
+    Received has value: undefined
+
+    [0m [90m 247 |[39m
+     [90m 248 |[39m     expect(respuesta[33m.[39mstatus)[33m.[39mtoBe([35m200[39m)[33m;[39m
+    [31m[1m>[22m[39m[90m 249 |[39m     expect(respuesta[33m.[39mheaders[[32m'content-security-policy'[39m])[33m.[39mtoContain([32m"default-src 'self'"[39m)[33m;[39m
+     [90m     |[39m                                                          [31m[1m^[22m[39m
+     [90m 250 |[39m     expect(respuesta[33m.[39mheaders[[32m'x-content-type-options'[39m])[33m.[39mtoBe([32m'nosniff'[39m)[33m;[39m
+     [90m 251 |[39m     expect(respuesta[33m.[39mheaders[[32m'x-frame-options'[39m])[33m.[39mtoBe([32m'DENY'[39m)[33m;[39m
+     [90m 252 |[39m     expect(respuesta[33m.[39mheaders[[32m'referrer-policy'[39m])[33m.[39mtoBe([32m'no-referrer'[39m)[33m;[39m[0m
+
+      at Object.<anonymous> (tests/integration/autenticacion.test.js:249:58)
+
+  ● CP-SEG-06 · Cabeceras de seguridad HTTP (NFR-SEG-10) › no revela el framework en la cabecera X-Powered-By (OWASP A05)
+
+    expect(received).toBeUndefined()
+
+    Received: "Express"
+
+    [0m [90m 257 |[39m   test([32m'no revela el framework en la cabecera X-Powered-By (OWASP A05)'[39m[33m,[39m [36masync[39m () [33m=>[39m {
+     [90m 258 |[39m     [36mconst[39m respuesta [33m=[39m [36mawait[39m request(entorno[33m.[39mapp)[33m.[39m[36mget[39m([32m'/api/v1/salud'[39m)[33m;[39m
+    [31m[1m>[22m[39m[90m 259 |[39m     expect(respuesta[33m.[39mheaders[[32m'x-powered-by'[39m])[33m.[39mtoBeUndefined()[33m;[39m
+     [90m     |[39m                                               [31m[1m^[22m[39m
+     [90m 260 |[39m   })[33m;[39m
+     [90m 261 |[39m
+     [90m 262 |[39m   test([32m'una ruta inexistente responde 404 con cuerpo JSON controlado'[39m[33m,[39m [36masync[39m () [33m=>[39m {[0m
+
+      at Object.<anonymous> (tests/integration/autenticacion.test.js:259:47)
+
+FAIL tests/integration/pacientesYExamenes.test.js (45.915 s)
+  ● CP-FUN-06 · Registro de paciente por el medico (RF-2.2) › crea el paciente con 201 y normaliza el RUT
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "20347024-K"
+    Received: "20.347.024-K"
+
+    [0m [90m 46 |[39m
+     [90m 47 |[39m     expect(respuesta[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+    [31m[1m>[22m[39m[90m 48 |[39m     expect(respuesta[33m.[39mbody[33m.[39mrut)[33m.[39mtoBe([32m'20347024-K'[39m)[33m;[39m
+     [90m    |[39m                                [31m[1m^[22m[39m
+     [90m 49 |[39m     expect(respuesta[33m.[39mbody[33m.[39mid)[33m.[39mtoBeDefined()[33m;[39m
+     [90m 50 |[39m   })[33m;[39m
+     [90m 51 |[39m[0m
+
+      at Object.<anonymous> (tests/integration/pacientesYExamenes.test.js:48:32)
+
+  ● CP-FUN-06 · Registro de paciente por el medico (RF-2.2) › rechaza un RUT con digito verificador invalido (400)
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 400
+    Received: 201
+
+    [0m [90m 73 |[39m     )[33m;[39m
+     [90m 74 |[39m
+    [31m[1m>[22m[39m[90m 75 |[39m     expect(respuesta[33m.[39mstatus)[33m.[39mtoBe([35m400[39m)[33m;[39m
+     [90m    |[39m                              [31m[1m^[22m[39m
+     [90m 76 |[39m   })[33m;[39m
+     [90m 77 |[39m
+     [90m 78 |[39m   test([32m'rechaza la creacion sin nombres o sin apellidos (400)'[39m[33m,[39m [36masync[39m () [33m=>[39m {[0m
+
+      at Object.<anonymous> (tests/integration/pacientesYExamenes.test.js:75:30)
+
+  ● CP-FUN-06 · Edicion y baja de paciente (RF-2.3) › permite cambiar el RUT a uno valido y no utilizado
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "20347024-K"
+    Received: "20.347.024-K"
+
+    [0m [90m 120 |[39m
+     [90m 121 |[39m     expect(respuesta[33m.[39mstatus)[33m.[39mtoBe([35m200[39m)[33m;[39m
+    [31m[1m>[22m[39m[90m 122 |[39m     expect(respuesta[33m.[39mbody[33m.[39mrut)[33m.[39mtoBe([32m'20347024-K'[39m)[33m;[39m
+     [90m     |[39m                                [31m[1m^[22m[39m
+     [90m 123 |[39m   })[33m;[39m
+     [90m 124 |[39m
+     [90m 125 |[39m   test([32m'rechaza con 409 el cambio a un RUT que ya pertenece a otro paciente'[39m[33m,[39m [36masync[39m () [33m=>[39m {[0m
+
+      at Object.<anonymous> (tests/integration/pacientesYExamenes.test.js:122:32)
+
+FAIL tests/integration/accesoYRoles.test.js (71.956 s)
+  ● CP-SEG-01 · RBAC en backend: el paciente solo lee (NFR-SEG-4, RB-1) › un paciente NO puede crear un examen (403)
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 403
+    Received: 201
+
+    [0m [90m 46 |[39m     )[33m;[39m
+     [90m 47 |[39m
+    [31m[1m>[22m[39m[90m 48 |[39m     expect(respuesta[33m.[39mstatus)[33m.[39mtoBe([35m403[39m)[33m;[39m
+     [90m    |[39m                              [31m[1m^[22m[39m
+     [90m 49 |[39m     expect(respuesta[33m.[39mbody[33m.[39merror)[33m.[39mtoBe([32m'NO_AUTORIZADO'[39m)[33m;[39m
+     [90m 50 |[39m   })[33m;[39m
+     [90m 51 |[39m[0m
+
+      at Object.<anonymous> (tests/integration/accesoYRoles.test.js:48:30)
+
+  ● CP-SEG-01 · RBAC en backend: el paciente solo lee (NFR-SEG-4, RB-1) › un paciente NO puede modificar su propio examen (403)
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 403
+    Received: 200
+
+    [0m [90m 58 |[39m     )[33m;[39m
+     [90m 59 |[39m
+    [31m[1m>[22m[39m[90m 60 |[39m     expect(respuesta[33m.[39mstatus)[33m.[39mtoBe([35m403[39m)[33m;[39m
+     [90m    |[39m                              [31m[1m^[22m[39m
+     [90m 61 |[39m     [90m// La informacion del examen no cambio.[39m
+     [90m 62 |[39m     [36mconst[39m examen [33m=[39m [36mawait[39m entorno[33m.[39mgateways[33m.[39mexamenGateway[33m.[39mobtenerPorId(escenario[33m.[39mexamen[33m.[39mid)[33m;[39m
+     [90m 63 |[39m     expect(examen[33m.[39mestado)[33m.[39mtoBe([32m'PENDIENTE'[39m)[33m;[39m[0m
+
+      at Object.<anonymous> (tests/integration/accesoYRoles.test.js:60:30)
+
+  ● CP-SEG-01 · RBAC en backend: el paciente solo lee (NFR-SEG-4, RB-1) › un paciente NO puede eliminar un examen (403)
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 403
+    Received: 200
+
+    [0m [90m 70 |[39m     )[33m;[39m
+     [90m 71 |[39m
+    [31m[1m>[22m[39m[90m 72 |[39m     expect(respuesta[33m.[39mstatus)[33m.[39mtoBe([35m403[39m)[33m;[39m
+     [90m    |[39m                              [31m[1m^[22m[39m
+     [90m 73 |[39m     expect([36mawait[39m entorno[33m.[39mgateways[33m.[39mexamenGateway[33m.[39mobtenerPorId(escenario[33m.[39mexamen[33m.[39mid))[33m.[39mnot[33m.[39mtoBeNull()[33m;[39m
+     [90m 74 |[39m   })[33m;[39m
+     [90m 75 |[39m[0m
+
+      at Object.<anonymous> (tests/integration/accesoYRoles.test.js:72:30)
+
+  ● CP-INT-05 · Unicidad de RUT del paciente (INC-01) › rechaza el MISMO RUT escrito con puntos: la normalizacion lo detecta
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 409
+    Received: 201
+
+    [0m [90m 285 |[39m     )[33m;[39m
+     [90m 286 |[39m
+    [31m[1m>[22m[39m[90m 287 |[39m     expect(respuesta[33m.[39mstatus)[33m.[39mtoBe([35m409[39m)[33m;[39m
+     [90m     |[39m                              [31m[1m^[22m[39m
+     [90m 288 |[39m   })[33m;[39m
+     [90m 289 |[39m
+     [90m 290 |[39m   test([32m'un duplicado devuelve 409 y no un 500 opaco'[39m[33m,[39m [36masync[39m () [33m=>[39m {[0m
+
+      at Object.<anonymous> (tests/integration/accesoYRoles.test.js:287:30)
+
+  ● CP-INT-01 a CP-INT-03 · Documentos clinicos (RF-4.2 a RF-4.4) › CP-SEG-07 · rechaza un ejecutable que se declara PDF (NFR-SEG-12)
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 400
+    Received: 201
+
+    [0m [90m 330 |[39m     )[33m;[39m
+     [90m 331 |[39m
+    [31m[1m>[22m[39m[90m 332 |[39m     expect(respuesta[33m.[39mstatus)[33m.[39mtoBe([35m400[39m)[33m;[39m
+     [90m     |[39m                              [31m[1m^[22m[39m
+     [90m 333 |[39m     expect(respuesta[33m.[39mbody[33m.[39mmensaje)[33m.[39mtoContain([32m'no corresponde al tipo declarado'[39m)[33m;[39m
+     [90m 334 |[39m   })[33m;[39m
+     [90m 335 |[39m[0m
+
+      at Object.<anonymous> (tests/integration/accesoYRoles.test.js:332:30)
+
+  ● CP-INT-04 · Eliminacion logica y auditoria (RF-3.3, RF-5.1) › la eliminacion de un examen es LOGICA: el registro permanece
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: undefined
+
+    [0m [90m 436 |[39m
+     [90m 437 |[39m     expect(respuesta[33m.[39mstatus)[33m.[39mtoBe([35m200[39m)[33m;[39m
+    [31m[1m>[22m[39m[90m 438 |[39m     expect(respuesta[33m.[39mbody[33m.[39mlogica)[33m.[39mtoBe([36mtrue[39m)[33m;[39m
+     [90m     |[39m                                   [31m[1m^[22m[39m
+     [90m 439 |[39m
+     [90m 440 |[39m     [90m// Ya no aparece entre los activos...[39m
+     [90m 441 |[39m     expect([36mawait[39m entorno[33m.[39mgateways[33m.[39mexamenGateway[33m.[39mobtenerPorId(escenario[33m.[39mexamen[33m.[39mid))[33m.[39mtoBeNull()[33m;[39m[0m
+
+      at Object.<anonymous> (tests/integration/accesoYRoles.test.js:438:35)
+
+------------------------------------------------|---------|----------|---------|---------|--------------------------------------------------
+File                                            | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s                                
+------------------------------------------------|---------|----------|---------|---------|--------------------------------------------------
+All files                                       |   87.62 |    73.97 |   84.97 |   87.54 |                                                  
+ src                                            |   88.23 |    71.42 |     100 |   88.23 |                                                  
+  app.js                                        |   88.23 |    71.42 |     100 |   88.23 | 88,100                                           
+ src/application/usecase                        |    85.2 |    62.82 |   97.05 |   85.14 |                                                  
+  AuditoriaUseCase.js                           |   88.88 |    83.33 |     100 |   88.88 | 19                                               
+  AuthUseCase.js                                |   94.44 |    72.72 |     100 |   94.44 | 138,155,159                                      
+  DocumentoUseCase.js                           |   68.57 |    46.42 |      80 |   68.57 | 48,80,99-116                                     
+  ExamenUseCase.js                              |   90.24 |    53.84 |     100 |   90.24 | 26,32,48,82                                      
+  PacienteUseCase.js                            |   95.91 |    78.57 |     100 |   95.91 | 27,45                                            
+  UsuarioUseCase.js                             |   74.19 |    51.11 |     100 |   73.77 | 28,45,53,56,59,88,98-102,110,117,120,123-124,147 
+ src/domain/error                               |     100 |       75 |     100 |     100 |                                                  
+  errors.js                                     |     100 |       75 |     100 |     100 | 50                                               
+ src/domain/gateway                             |       0 |      100 |       0 |       0 |                                                  
+  gateways.js                                   |       0 |      100 |       0 |       0 | 14-141                                           
+ src/domain/model                               |   87.38 |    84.81 |   88.88 |   88.07 |                                                  
+  Documento.js                                  |     100 |      100 |     100 |     100 |                                                  
+  Examen.js                                     |     100 |      100 |     100 |     100 |                                                  
+  Paciente.js                                   |   56.25 |    69.56 |      60 |   58.06 | 5-18,32,82                                       
+  RegistroAuditoria.js                          |     100 |    57.14 |     100 |     100 | 10-11,17                                         
+  Usuario.js                                    |     100 |    88.88 |     100 |     100 | 48,53                                            
+  roles.js                                      |     100 |      100 |     100 |     100 |                                                  
+ src/infrastructure/adapters/memory             |   98.13 |    89.74 |   98.11 |   98.01 |                                                  
+  gatewaysMemoria.js                            |   98.13 |    89.74 |   98.11 |   98.01 | 190-191                                          
+ src/infrastructure/config                      |     100 |    83.33 |     100 |     100 |                                                  
+  logger.js                                     |     100 |    83.33 |     100 |     100 | 13-29                                            
+ src/infrastructure/entrypoints/rest/middleware |   80.82 |    71.69 |   90.47 |   80.55 |                                                  
+  autenticacion.js                              |   86.36 |    71.42 |     100 |   86.36 | 24,31,54                                         
+  errorHandler.js                               |   74.07 |    60.86 |     100 |   74.07 | 24,43-47,64,94,100-101                           
+  seguridad.js                                  |      50 |       50 |      60 |      50 | 21-45                                            
+  validacion.js                                 |     100 |      100 |     100 |     100 |                                                  
+ src/infrastructure/entrypoints/rest/routes     |   98.07 |    83.33 |   97.36 |   98.03 |                                                  
+  auth.routes.js                                |     100 |      100 |     100 |     100 |                                                  
+  comun.js                                      |     100 |      100 |     100 |     100 |                                                  
+  documentos.routes.js                          |    90.9 |      100 |   66.66 |    90.9 | 50                                               
+  examenes.routes.js                            |   95.65 |       50 |     100 |   95.45 | 87                                               
+  index.js                                      |     100 |      100 |     100 |     100 |                                                  
+  pacientes.routes.js                           |     100 |      100 |     100 |     100 |                                                  
+  usuarios.routes.js                            |     100 |      100 |     100 |     100 |                                                  
+ src/infrastructure/entrypoints/rest/schema     |     100 |      100 |     100 |     100 |                                                  
+  esquemas.js                                   |     100 |      100 |     100 |     100 |                                                  
+ src/infrastructure/security                    |   97.82 |    84.61 |     100 |   97.82 |                                                  
+  password.js                                   |     100 |       95 |     100 |     100 | 13                                               
+  token.js                                      |   95.65 |    73.68 |     100 |   95.65 | 81                                               
+ src/infrastructure/storage                     |     100 |      100 |     100 |     100 |                                                  
+  StorageLocal.js                               |     100 |      100 |     100 |     100 |                                                  
+------------------------------------------------|---------|----------|---------|---------|--------------------------------------------------
+
+=============================== Coverage summary ===============================
+Statements   : 87.62% ( 708/808 )
+Branches     : 73.97% ( 324/438 )
+Functions    : 84.97% ( 198/233 )
+Lines        : 87.54% ( 696/795 )
+================================================================================
+Test Suites: 4 failed, 2 passed, 6 total
+Tests:       18 failed, 114 passed, 132 total
+Snapshots:   0 total
+Time:        72.564 s, estimated 73 s
+Ran all test suites.
+codigo de salida: 1

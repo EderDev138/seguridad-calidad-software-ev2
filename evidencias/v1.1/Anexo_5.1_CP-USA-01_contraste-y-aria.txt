@@ -1,0 +1,38 @@
+=====================================================================
+EVIDENCIA · Cuidarte+ v1.1
+---------------------------------------------------------------------
+Titulo      : Contraste de color y anuncio de mensajes de estado
+Caso        : CP-USA-01
+Requisito   : NFR-USAB-1, NFR-USAB-3, WCAG 2.1 (1.4.3, 1.4.11, 4.1.3), Ley 20.422
+Fecha        : 2026-10-12 17:33:09 -0300
+Ejecutado por: Eder Valdivia
+Comando      : node verificar-contraste.mjs
+=====================================================================
+
+Hoja de estilos analizada: C:/Users/eder_/OneDrive/Desktop/SeguridadSoftware/cuidarte+/EV2/evidencias/../codigo/cuidarte-plus-v1.1/web/src/estilos.css
+
+Umbrales WCAG 2.1 nivel AA:
+  texto normal     >= 4.5:1   (criterio 1.4.3)
+  texto grande     >= 3.0:1   (criterio 1.4.3)
+  componentes UI   >= 3.0:1   (criterio 1.4.11)
+
+ELEMENTO                              FRENTE    FONDO     RATIO    MINIMO  RESULTADO
+----------------------------------------------------------------------------------------
+Texto principal sobre panel           #1c2733   #ffffff   15.14:1  4.5:1   CUMPLE
+Texto principal sobre el fondo        #1c2733   #f4f7fa   14.08:1  4.5:1   CUMPLE
+Texto secundario y pistas de campo    #4a5a6a   #ffffff   7.09:1   4.5:1   CUMPLE
+Borde y foco de los controles         #0b5c8a   #ffffff   7.21:1   3.0:1   CUMPLE
+Mensaje de error                      #a3281f   #fdecea   6.37:1   4.5:1   CUMPLE
+Mensaje de exito                      #1c6b3a   #e8f5ec   5.82:1   4.5:1   CUMPLE
+Mensaje de aviso                      #7a4d00   #fdf3e2   6.61:1   4.5:1   CUMPLE
+Borde de campos y paneles             #7e8d9f   #ffffff   3.39:1   3.0:1   CUMPLE
+
+Resultado: todos los pares de color cumplen el umbral de WCAG 2.1 AA.
+
+--- Anuncio de mensajes de estado (WCAG 4.1.3) ---
+Archivo: C:/Users/eder_/OneDrive/Desktop/SeguridadSoftware/cuidarte+/EV2/evidencias/../codigo/cuidarte-plus-v1.1/web/src/componentes/Aviso.jsx
+  role="alert" / role="status" : PRESENTE
+  aria-live                    : PRESENTE
+  Correcto: los mensajes se anuncian al lector de pantalla.
+
+codigo de salida: 0  (1 = hay incumplimientos)

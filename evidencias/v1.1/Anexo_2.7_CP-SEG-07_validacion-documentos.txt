@@ -1,0 +1,26 @@
+=====================================================================
+EVIDENCIA · Cuidarte+ v1.1
+---------------------------------------------------------------------
+Titulo      : Solo se aceptan documentos de tipo permitido y contenido coherente
+Caso        : CP-SEG-07
+Requisito   : NFR-SEG-12, RF-4.3, OWASP A04
+Fecha        : 2026-10-12 17:33:18 -0300
+Ejecutado por: Eder Valdivia
+Comando      : curl multipart con archivos de prueba
+=====================================================================
+
+Se intentan subir tres archivos al examen id=15:
+  1. Un PDF real.
+  2. Un ejecutable de Windows renombrado a .pdf y declarado como PDF.
+  3. Un documento HTML con script.
+
+ARCHIVO                                                  OBTENIDO   ESPERADO
+informe-valido.pdf (PDF real)                            201        201
+malicioso.pdf (ejecutable disfrazado)                    400        400
+pagina.html (tipo no permitido)                          400        400
+
+El segundo caso es el relevante: el cliente DECLARA application/pdf.
+Si el sistema solo confiara en ese dato, aceptaria el ejecutable.
+
+--- Un paciente no puede adjuntar documentos (RB-1) ---
+POST /examenes/15/documentos como PACIENTE  ->  HTTP 403 (esperado 403)

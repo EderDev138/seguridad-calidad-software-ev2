@@ -1,0 +1,31 @@
+=====================================================================
+EVIDENCIA · Cuidarte+ v1.1
+---------------------------------------------------------------------
+Titulo      : El control de acceso se aplica en el backend
+Caso        : CP-SEG-01
+Requisito   : NFR-SEG-4, RB-1, RB-2, RB-3
+Fecha        : 2026-10-12 17:33:12 -0300
+Ejecutado por: Eder Valdivia
+Comando      : curl con token de cada rol
+=====================================================================
+
+Las peticiones se envian directamente a la API, sin pasar por la interfaz.
+Si el control estuviera solo en el frontend, estas operaciones tendrian exito.
+
+Se usa un examen creado solo para esta comprobacion (id=11), de
+modo que su eventual eliminacion no afecte a las demas secciones.
+
+OPERACION                                                  OBTENIDO   ESPERADO
+POST /examenes como PACIENTE                               403        403
+PUT /examenes/11 como PACIENTE                             403        403
+DELETE /examenes/11 como PACIENTE                          403        403
+POST /pacientes como PACIENTE                              403        403
+GET /usuarios como PACIENTE                                403        403
+GET /auditoria como PACIENTE                               403        403
+GET /usuarios como MEDICO                                  403        403
+GET /usuarios como ADMIN                                   200        200
+GET /auditoria como ADMIN                                  200        200
+POST /examenes como MEDICO                                 201        201
+
+Sin token (acceso anonimo):
+GET /pacientes sin Authorization                           401        401

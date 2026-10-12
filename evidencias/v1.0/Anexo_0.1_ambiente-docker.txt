@@ -1,0 +1,18 @@
+=====================================================================
+EVIDENCIA · Cuidarte+ v1.0
+---------------------------------------------------------------------
+Titulo      : Ambiente QA reproducible levantado
+Caso        : Precondicion de todos los casos
+Requisito   : ERS §4
+Fecha        : 2026-10-12 17:35:23 -0300
+Ejecutado por: Eder Valdivia
+Comando      : docker compose ps
+=====================================================================
+
+NAME                      IMAGE                   COMMAND                  SERVICE   CREATED              STATUS                        PORTS
+cuidarte-plus-v10-api-1   cuidarte-plus-v10-api   "dumb-init -- node s…"   api       About a minute ago   Up About a minute (healthy)   0.0.0.0:3000->3000/tcp, [::]:3000->3000/tcp
+cuidarte-plus-v10-db-1    postgres:17-alpine      "docker-entrypoint.s…"   db        About a minute ago   Up About a minute (healthy)   5432/tcp
+cuidarte-plus-v10-web-1   cuidarte-plus-v10-web   "/docker-entrypoint.…"   web       About a minute ago   Up About a minute (healthy)   0.0.0.0:5173->5173/tcp, [::]:5173->5173/tcp
+
+--- Healthcheck del servicio (NFR-DIS-3) ---
+{"estado":"operativo","version":"1.0.0","instante":"2026-10-12T20:35:23.792Z"}

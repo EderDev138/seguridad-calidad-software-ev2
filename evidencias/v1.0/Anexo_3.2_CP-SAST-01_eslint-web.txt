@@ -1,0 +1,22 @@
+=====================================================================
+EVIDENCIA · Cuidarte+ v1.0
+---------------------------------------------------------------------
+Titulo      : Analisis estatico del codigo de la SPA
+Caso        : CP-SAST-01 / CP-USA-01
+Requisito   : NFR-SEG-5, NFR-USAB-1 a 3, WCAG 2.1
+Fecha        : 2026-10-12 17:33:52 -0300
+Ejecutado por: Eder Valdivia
+Comando      : npm run lint (web)
+=====================================================================
+
+
+> cuidarte-web@1.0.0 lint
+> eslint .
+
+
+C:\Users\eder_\OneDrive\Desktop\SeguridadSoftware\cuidarte+\EV2\codigo\cuidarte-plus-v1.0\web\src\componentes\Examenes.jsx
+  199:13  error  Prohibido: dangerouslySetInnerHTML desactiva el escape de React y abre un vector de XSS (NFR-SEG-5). Renderice texto plano  no-restricted-syntax
+
+✖ 1 problem (1 error, 0 warnings)
+
+codigo de salida: 1

@@ -1,0 +1,60 @@
+=====================================================================
+EVIDENCIA · Cuidarte+ v1.1
+---------------------------------------------------------------------
+Titulo      : Latencia y tasa de error con 200 usuarios concurrentes
+Caso        : CP-PERF-01, CP-PERF-02, CP-PERF-03
+Requisito   : NFR-PERF-1, NFR-PERF-2, NFR-PERF-3
+Fecha        : 2026-10-12 17:33:21 -0300
+Ejecutado por: Eder Valdivia
+Comando      : node medir-rendimiento.mjs --usuarios 200 --iteraciones 3
+=====================================================================
+
+=====================================================================
+Cuidarte+ · Medicion de rendimiento y carga
+=====================================================================
+URL base       : http://localhost:3000/api/v1
+Concurrencia   : 200 usuarios simultaneos (NFR-PERF-3)
+Iteraciones    : 3
+Instante       : 2026-10-12T20:33:21.953Z
+
+Nota: la medicion se realiza desde el mismo equipo que aloja los
+contenedores, por lo que no incluye latencia de red. Las cifras miden
+el tiempo de proceso del servidor, que es lo que los umbrales del ERS
+acotan.
+Escenario   : Listado de pacientes (vista principal)
+Requisito   : NFR-PERF-2
+Umbral      : p95 <= 2000 ms
+Peticiones  : 600  (200 concurrentes x 3 iteraciones)
+Latencia    : p50 172 ms | p95 265 ms | p99 288 ms | media 179 ms | min 31 ms | max 294 ms
+Errores     : 0.00 %
+Rendimiento : 800 peticiones/s
+Veredicto   : CUMPLE
+Escenario   : Examenes de un paciente (CRUD simple)
+Requisito   : NFR-PERF-1
+Umbral      : p95 <= 300 ms
+Peticiones  : 600  (200 concurrentes x 3 iteraciones)
+Latencia    : p50 178 ms | p95 222 ms | p99 230 ms | media 177 ms | min 98 ms | max 232 ms
+Errores     : 0.00 %
+Rendimiento : 888 peticiones/s
+Veredicto   : CUMPLE
+Escenario   : Healthcheck (linea base del servicio)
+Requisito   : NFR-DIS-3
+Umbral      : p95 <= 300 ms
+Peticiones  : 600  (200 concurrentes x 3 iteraciones)
+Latencia    : p50 18 ms | p95 33 ms | p99 35 ms | media 20 ms | min 11 ms | max 36 ms
+Errores     : 0.00 %
+Rendimiento : 4335 peticiones/s
+Veredicto   : CUMPLE
+---------------------------------------------------------------------
+RESUMEN
+---------------------------------------------------------------------
+ESCENARIO                                 REQUISITO    UMBRAL    p95       VEREDICTO
+-------------------------------------------------------------------------------------
+Listado de pacientes (vista principal)    NFR-PERF-2   2000 ms   265 ms    CUMPLE
+Examenes de un paciente (CRUD simple)     NFR-PERF-1   300 ms    222 ms    CUMPLE
+Healthcheck (linea base del servicio)     NFR-DIS-3    300 ms    33 ms     CUMPLE
+Resultado: todos los escenarios cumplen los umbrales del ERS.
+
+Nota: el artefacto formal del plan es api/jmeter/cuidarte-carga.jmx,
+que mide los mismos umbrales con Apache JMeter. Este script produce
+las cifras citadas en el informe sin requerir esa instalacion.

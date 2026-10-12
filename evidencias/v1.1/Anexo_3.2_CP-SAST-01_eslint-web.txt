@@ -1,0 +1,16 @@
+=====================================================================
+EVIDENCIA · Cuidarte+ v1.1
+---------------------------------------------------------------------
+Titulo      : Analisis estatico del codigo de la SPA
+Caso        : CP-SAST-01 / CP-USA-01
+Requisito   : NFR-SEG-5, NFR-USAB-1 a 3, WCAG 2.1
+Fecha        : 2026-10-12 17:31:40 -0300
+Ejecutado por: Eder Valdivia
+Comando      : npm run lint (web)
+=====================================================================
+
+
+> cuidarte-web@1.1.0 lint
+> eslint .
+
+codigo de salida: 0

@@ -1,0 +1,43 @@
+=====================================================================
+EVIDENCIA · Cuidarte+ v1.0
+---------------------------------------------------------------------
+Titulo      : Inyeccion SQL en el parametro de filtro de la auditoria
+Caso        : CP-SEG-03
+Requisito   : NFR-SEG-5, OWASP A03, Ley 21.663
+Fecha        : 2026-10-12 17:35:25 -0300
+Ejecutado por: Eder Valdivia
+Comando      : revision del codigo + payload contra /auditoria
+=====================================================================
+
+Este hallazgo ilustra por que un plan de pruebas necesita VARIAS
+tecnicas: las pruebas unitarias corren contra el adaptador en memoria,
+que no ejecuta SQL, de modo que no pueden detectarlo. Solo aparece en
+la revision del codigo y en la prueba dinamica contra PostgreSQL.
+
+--- 1. Revision del codigo (SAST / revision manual) ---
+La firma de la inyeccion es una interpolacion dentro de las comillas
+simples del SQL. Con parametros posicionales ($1, $2) eso no existe.
+Se busca interpolacion de variables dentro de cadenas SQL:
+/c/Users/eder_/OneDrive/Desktop/SeguridadSoftware/cuidarte+/EV2/evidencias/../codigo/cuidarte-plus-v1.0/api/src/infrastructure/adapters/postgres/gatewaysPostgres.js:456:      condiciones.push(`accion = '${filtro.accion}'`);
+
+HALLAZGO: la condicion se construye concatenando el valor recibido.
+Lo correcto es un parametro posicional ($1, $2, ...).
+
+Consultas que SI usan parametros posicionales:
+  usos de parametros posicionales: 3
+
+--- 2. Prueba dinamica contra el servicio en ejecucion ---
+Peticion legitima (filtro por una accion existente):
+  GET /auditoria?accion=LOGIN  ->  HTTP 200
+  registros devueltos: 3
+
+Payload de inyeccion (tautologia que deberia ser tratada como texto):
+  GET /auditoria?accion=LOGIN' OR '1'='1  ->  HTTP 200
+  registros devueltos con el payload: 10
+
+HALLAZGO CONFIRMADO: el payload altero la consulta y devolvio filas
+que el filtro legitimo no habria devuelto. La condicion inyectada se
+evaluo como SQL, no como texto. Vector de inyeccion explotable.
+
+Respuesta (primeros 300 caracteres):
+[{"id":10,"usuarioId":2,"accion":"CREAR_EXAMEN","entidad":"examen","entidadId":9,"detalle":"pacienteId=1","ip":"::ffff:172.22.0.1","creadoEn":"2026-10-12T20:35:25.324Z"},{"id":9,"usuarioId":6,"accion":"REGISTRO_USUARIO","entidad":"usuario","entidadId":6,"detalle":null,"ip":"::ffff:172.22.0.1","cread

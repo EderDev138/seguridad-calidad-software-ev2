@@ -1,0 +1,38 @@
+=====================================================================
+EVIDENCIA · Cuidarte+ v1.1
+---------------------------------------------------------------------
+Titulo      : Registro de acciones criticas y baja logica
+Caso        : CP-INT-04
+Requisito   : RF-3.3, RF-5.1, ISO/IEC 27001
+Fecha        : 2026-10-12 17:33:17 -0300
+Ejecutado por: Eder Valdivia
+Comando      : curl + consulta a la base
+=====================================================================
+
+--- Ultimos registros de auditoria (RF-5.1) ---
+2026-10-12T20:33:16.676Z  LOGIN  usuario=2  usuario#2
+2026-10-12T20:33:14.754Z  LOGOUT  usuario=2  usuario#2
+2026-10-12T20:33:14.637Z  LOGIN  usuario=2  usuario#2
+2026-10-12T20:33:13.811Z  CREAR_EXAMEN  usuario=2  examen#13
+2026-10-12T20:33:13.233Z  CREAR_EXAMEN  usuario=2  examen#12
+2026-10-12T20:33:12.644Z  CREAR_EXAMEN  usuario=2  examen#11
+2026-10-12T20:33:11.946Z  LOGIN  usuario=4  usuario#4
+2026-10-12T20:33:11.642Z  LOGIN  usuario=2  usuario#2
+2026-10-12T20:33:11.315Z  LOGIN  usuario=1  usuario#1
+2026-10-12T20:30:44.024Z  LOGIN  usuario=2  usuario#2
+2026-10-12T20:30:41.248Z  LOGIN_FALLIDO  usuario=2  usuario#2
+2026-10-12T20:30:40.685Z  SUBIR_DOCUMENTO  usuario=2  documento#1
+
+--- Eliminacion logica de un examen (RF-3.3) ---
+Examen creado con id=14
+DELETE /examenes/14  ->  HTTP 200 (esperado 200)
+GET /examenes/14 (ya no debe estar activo)  ->  HTTP 404 (esperado 404)
+
+El registro debe SEGUIR EXISTIENDO en la base, con su marca de baja:
+ id |          tipo           | dado_de_baja 
+----+-------------------------+--------------
+ 14 | Examen para dar de baja | t
+(1 row)
+
+Si la consulta no devuelve ninguna fila, la eliminacion fue FISICA y
+se incumple el criterio de aceptacion de RF-3.3.
