@@ -1,0 +1,32 @@
+{
+  "name": "cuidarte-web",
+  "version": "1.0.0",
+  "private": true,
+  "description": "SPA de Cuidarte+ — React 19 + Vite",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview --host 0.0.0.0 --port 5173",
+    "lint": "eslint .",
+    "format": "prettier --check src index.html",
+    "format:fix": "prettier --write src index.html",
+    "audit:deps": "npm audit --audit-level=high",
+    "verify": "npm run format && npm run lint && npm run build && npm run audit:deps"
+  },
+  "dependencies": {
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "9.39.5",
+    "@vitejs/plugin-react": "6.1.2",
+    "eslint": "9.39.5",
+    "eslint-plugin-jsx-a11y": "6.10.2",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "7.1.1",
+    "globals": "17.13.0",
+    "prettier": "3.9.10",
+    "vite": "8.3.4"
+  }
+}

@@ -1,0 +1,7 @@
+node_modules/
+coverage/
+reports/
+storage-documentos/
+.env
+*.log
+.stryker-tmp/

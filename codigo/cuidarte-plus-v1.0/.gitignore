@@ -1,0 +1,20 @@
+# Secretos del ambiente: nunca se versionan (NFR-SEG-13)
+.env
+
+# Dependencias y artefactos de construccion
+node_modules/
+dist/
+coverage/
+
+# Reportes de las herramientas (se adjuntan como evidencia, no al repo)
+reportes/
+*.jtl
+report_html.html
+report_md.md
+report_json.json
+
+# Storage local de documentos clinicos: datos, no codigo
+storage-documentos/
+
+# Logs
+*.log

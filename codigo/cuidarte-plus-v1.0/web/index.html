@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <!-- Viewport responsivo: requisito NFR-COMPAT-2 (moviles y tablets). -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Cuidarte+ — gestion de pacientes, examenes medicos y documentos clinicos"
+    />
+    <!--
+      Referrer restringido tambien desde el documento: evita filtrar la URL
+      (que puede contener identificadores) a recursos externos (NFR-SEG-10).
+    -->
+    <meta name="referrer" content="no-referrer" />
+    <title>Cuidarte+ · Sistema de examenes medicos</title>
+  </head>
+  <body>
+    <!-- Enlace de salto: permite a quien navega por teclado o lector de
+         pantalla ir directo al contenido (WCAG 2.4.1, NFR-USAB-1). -->
+    <a class="salto-contenido" href="#contenido">Saltar al contenido principal</a>
+    <div id="raiz"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

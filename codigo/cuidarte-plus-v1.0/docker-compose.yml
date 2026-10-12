@@ -1,0 +1,165 @@
+# =====================================================================
+# Cuidarte+ · Ambiente QA reproducible (ERS §4)
+#
+# Levanta los tres componentes que define la ERS: SPA React, API Express y
+# PostgreSQL. Es el ambiente sobre el que se ejecutan los casos de prueba y se
+# capturan las evidencias del informe.
+#
+# Controles de seguridad del ambiente:
+#   * Los secretos se leen del archivo .env (NFR-SEG-13). No hay credenciales
+#     escritas en este archivo.
+#   * PostgreSQL NO publica su puerto hacia el host por defecto: solo es
+#     alcanzable desde la red interna de Docker. Para inspeccionar la base en
+#     QA se usa el perfil `depuracion`.
+#   * Cada servicio declara su healthcheck y el orden de arranque depende de
+#     esos healthchecks, no de un `sleep` (NFR-DIS-1).
+#   * Los contenedores corren con `no-new-privileges` y sistema de archivos de
+#     solo lectura donde es posible.
+#
+# Uso:
+#   cp .env.example .env     # y completar los secretos
+#   docker compose up -d --build
+#   docker compose ps
+#   docker compose logs -f api
+#   docker compose down -v   # elimina tambien los volumenes
+# =====================================================================
+
+# El nombre del proyecto incluye la version. Sin esto, las dos versiones
+# del software comparten contenedores, volumenes y etiquetas de imagen, de
+# modo que construir una sobrescribe la otra y la evidencia deja de
+# corresponder al codigo que se cree estar auditando.
+name: cuidarte-plus-v10
+
+services:
+  # -------------------------------------------------------------------
+  # Base de datos (ERS §4.2)
+  # -------------------------------------------------------------------
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-cuidarte}
+      POSTGRES_USER: ${POSTGRES_USER:-cuidarte}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Defina POSTGRES_PASSWORD en el archivo .env}
+      # Cifrado de contrasenas del motor con SCRAM en vez de md5.
+      POSTGRES_INITDB_ARGS: '--auth-host=scram-sha-256'
+    volumes:
+      - datos-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-cuidarte} -d ${POSTGRES_DB:-cuidarte}']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - interna
+
+  # -------------------------------------------------------------------
+  # API REST (ERS §3.1.2)
+  # -------------------------------------------------------------------
+  api:
+    build:
+      context: ./api
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      APP_VERSION: ${APP_VERSION:-1.1.0}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-cuidarte}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-cuidarte}
+      JWT_SECRET: ${JWT_SECRET:?Defina JWT_SECRET en el archivo .env}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:?Defina JWT_REFRESH_SECRET en el archivo .env}
+      JWT_VIGENCIA_ACCESO: ${JWT_VIGENCIA_ACCESO:-15m}
+      JWT_VIGENCIA_REFRESH: ${JWT_VIGENCIA_REFRESH:-8h}
+      BCRYPT_COST: ${BCRYPT_COST:-12}
+      PASSWORD_LARGO_MINIMO: ${PASSWORD_LARGO_MINIMO:-12}
+      LOGIN_MAX_INTENTOS: ${LOGIN_MAX_INTENTOS:-5}
+      LOGIN_MINUTOS_BLOQUEO: ${LOGIN_MINUTOS_BLOQUEO:-15}
+      RATE_LIMIT_AUTH: ${RATE_LIMIT_AUTH:-10}
+      RATE_LIMIT_GENERAL: ${RATE_LIMIT_GENERAL:-300}
+      # La SPA se sirve por el mismo origen a traves de nginx, por lo que el
+      # unico origen cruzado permitido es el servidor de desarrollo de Vite.
+      CORS_ORIGENES: ${CORS_ORIGENES:-http://localhost:5173}
+      STORAGE_DIR: /app/storage-documentos
+    ports:
+      # Publicado para poder ejecutar Postman, JMeter y ZAP contra la API.
+      - '${API_PUERTO:-3000}:3000'
+    volumes:
+      - documentos:/app/storage-documentos
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - interna
+
+  # -------------------------------------------------------------------
+  # SPA (ERS §3.1.1)
+  # -------------------------------------------------------------------
+  web:
+    build:
+      context: ./web
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_started
+    ports:
+      - '${WEB_PUERTO:-5173}:5173'
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - interna
+
+  # -------------------------------------------------------------------
+  # Carga de datos de prueba (perfil `semilla`)
+  #
+  # Se ejecuta a demanda y no en cada arranque:
+  #   docker compose --profile semilla run --rm semilla
+  # -------------------------------------------------------------------
+  semilla:
+    image: postgres:17-alpine
+    profiles: ['semilla']
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - ./api/src/infrastructure/adapters/postgres:/semilla:ro
+    entrypoint:
+      - sh
+      - -c
+      - >
+        psql -h db -U ${POSTGRES_USER:-cuidarte} -d ${POSTGRES_DB:-cuidarte}
+        -v ON_ERROR_STOP=1 -f /semilla/schema.sql -f /semilla/seed.sql
+    networks:
+      - interna
+
+  # -------------------------------------------------------------------
+  # Acceso a la base para inspeccion manual (perfil `depuracion`)
+  #
+  # Publica el puerto de PostgreSQL SOLO cuando se pide explicitamente:
+  #   docker compose --profile depuracion up -d db-expuesta
+  # -------------------------------------------------------------------
+  db-expuesta:
+    image: alpine/socat:1.8.0.3
+    profiles: ['depuracion']
+    depends_on:
+      db:
+        condition: service_healthy
+    command: tcp-listen:5432,fork,reuseaddr tcp-connect:db:5432
+    ports:
+      - '${DB_PUERTO:-5432}:5432'
+    networks:
+      - interna
+
+volumes:
+  datos-db:
+  documentos:
+
+networks:
+  interna:
+    driver: bridge

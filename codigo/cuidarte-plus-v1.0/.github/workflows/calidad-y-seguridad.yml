@@ -1,0 +1,435 @@
+# =====================================================================
+# Cuidarte+ · Pipeline de calidad y seguridad
+# Casos CP-CAL-01 y CP-CAL-02 · NFR-SEG-14, NFR-CAL-1 a 5, NFR-TRAZ-1
+#
+# El pipeline implementa el requisito NFR-SEG-14 (propuesto): ningun cambio
+# llega a la rama principal sin pasar las puertas de calidad y seguridad.
+# Cada job corresponde a un control del plan de pruebas, de modo que el
+# resultado del pipeline ES la evidencia de ejecucion de esos casos.
+#
+# Orden de las etapas (de la mas rapida y barata a la mas costosa, para que el
+# desarrollador reciba el primer error en segundos y no en minutos):
+#
+#   formato -> lint -> pruebas+cobertura -> BDD -> SCA -> contenedor+Trivy -> DAST
+#
+# Secretos necesarios (Settings > Secrets and variables > Actions):
+#   SONAR_TOKEN, SONAR_HOST_URL   analisis SAST en SonarQube (opcional)
+#   SNYK_TOKEN                    analisis de dependencias con Snyk (opcional)
+# Ninguno se escribe en el repositorio (NFR-SEG-13).
+# =====================================================================
+
+name: Calidad y seguridad
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  workflow_dispatch:
+
+# Permisos minimos: el workflow solo necesita leer el repositorio.
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: '24'
+
+jobs:
+  # ===================================================================
+  # 1. Formato · NFR-CAL-5
+  # ===================================================================
+  formato:
+    name: Formato (Prettier)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: |
+            api/package-lock.json
+            web/package-lock.json
+
+      - name: Instalar dependencias de la API
+        working-directory: api
+        run: npm ci --no-audit --no-fund
+
+      - name: Verificar formato de la API
+        working-directory: api
+        run: npm run format
+
+      - name: Instalar dependencias de la SPA
+        working-directory: web
+        run: npm ci --no-audit --no-fund
+
+      - name: Verificar formato de la SPA
+        working-directory: web
+        run: npm run format
+
+  # ===================================================================
+  # 2. Analisis estatico del codigo propio · CP-SAST-01, NFR-SEG-5
+  # ===================================================================
+  lint:
+    name: Analisis estatico (ESLint)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: |
+            api/package-lock.json
+            web/package-lock.json
+
+      - name: Instalar dependencias de la API
+        working-directory: api
+        run: npm ci --no-audit --no-fund
+
+      # Incluye eslint-plugin-security: detecta patrones de riesgo sin
+      # ejecutar la aplicacion.
+      - name: ESLint en la API (reglas de seguridad)
+        working-directory: api
+        run: npm run lint
+
+      - name: Instalar dependencias de la SPA
+        working-directory: web
+        run: npm ci --no-audit --no-fund
+
+      # Incluye eslint-plugin-jsx-a11y: convierte la accesibilidad del ERS
+      # (NFR-USAB-1 a 3) en una puerta automatizada, y prohibe
+      # dangerouslySetInnerHTML (vector del XSS de la version 1.0).
+      - name: ESLint en la SPA (seguridad y accesibilidad)
+        working-directory: web
+        run: npm run lint
+
+  # ===================================================================
+  # 3. Pruebas y cobertura · NFR-CAL-1
+  # ===================================================================
+  pruebas:
+    name: Pruebas unitarias e integracion + cobertura
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: api/package-lock.json
+
+      - name: Instalar dependencias
+        working-directory: api
+        run: npm ci --no-audit --no-fund
+
+      # El umbral de cobertura esta en jest.config.js: si la cobertura baja
+      # del minimo, este paso falla y el pipeline se detiene.
+      - name: Ejecutar pruebas con cobertura
+        working-directory: api
+        run: npm run test:cov
+
+      - name: Publicar el informe de cobertura como evidencia
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cobertura-jest
+          path: api/coverage/
+          retention-days: 30
+
+  # ===================================================================
+  # 4. Pruebas de comportamiento · CP-INT y reglas de negocio
+  # ===================================================================
+  bdd:
+    name: Escenarios BDD (Cucumber)
+    runs-on: ubuntu-latest
+    needs: pruebas
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: api/package-lock.json
+
+      - name: Instalar dependencias
+        working-directory: api
+        run: npm ci --no-audit --no-fund
+
+      # Los escenarios estan escritos en Gherkin en espanol: validan el
+      # COMPORTAMIENTO que espera el negocio (RB-1, RB-2, RB-3), no la
+      # implementacion.
+      - name: Ejecutar escenarios
+        working-directory: api
+        run: npm run test:bdd
+
+  # ===================================================================
+  # 5. Analisis de dependencias (SCA) · CP-SCA-01, NFR-CAL-4
+  # ===================================================================
+  dependencias:
+    name: Dependencias (npm audit / Snyk)
+    runs-on: ubuntu-latest
+    # El contexto `secrets` no se puede usar dentro de una expresion `if`, por
+    # lo que se expone como variable de entorno del job y la condicion evalua
+    # esa variable.
+    env:
+      SNYK_CONFIGURADO: ${{ secrets.SNYK_TOKEN != '' }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: |
+            api/package-lock.json
+            web/package-lock.json
+
+      - name: Instalar dependencias de la API
+        working-directory: api
+        run: npm ci --no-audit --no-fund
+
+      # Puerta estricta sobre las dependencias que llegan a produccion: el
+      # codigo que se despliega no puede llevar ninguna vulnerabilidad
+      # conocida (NFR-CAL-4).
+      - name: Auditar dependencias de produccion de la API
+        working-directory: api
+        run: npm audit --omit=dev --audit-level=low
+
+      # Las dependencias de desarrollo (cadena de Jest) se auditan con un
+      # umbral mas alto: no se despliegan, pero un hallazgo critico o alto si
+      # bloquea, porque ejecutan codigo en el pipeline.
+      - name: Auditar todas las dependencias de la API
+        working-directory: api
+        run: npm audit --audit-level=high
+
+      - name: Instalar dependencias de la SPA
+        working-directory: web
+        run: npm ci --no-audit --no-fund
+
+      - name: Auditar dependencias de produccion de la SPA
+        working-directory: web
+        run: npm audit --omit=dev --audit-level=low
+
+      - name: Auditar todas las dependencias de la SPA
+        working-directory: web
+        run: npm audit --audit-level=high
+
+      # Snyk complementa a npm audit: usa su propia base de vulnerabilidades y
+      # detecta rutas transitivas que npm audit no reporta. Se omite si el
+      # repositorio no tiene configurado el secreto.
+      - name: Analizar con Snyk (si hay token)
+        if: env.SNYK_CONFIGURADO == 'true'
+        uses: snyk/actions/node@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --severity-threshold=high --all-projects
+
+  # ===================================================================
+  # 6. SonarQube · CP-SAST-01, NFR-CAL-3
+  # ===================================================================
+  sonarqube:
+    name: Quality Gate (SonarQube)
+    runs-on: ubuntu-latest
+    needs: pruebas
+    if: ${{ github.event_name != 'pull_request' }}
+    env:
+      SONAR_CONFIGURADO: ${{ secrets.SONAR_TOKEN != '' }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          # Sonar necesita el historial completo para atribuir el codigo nuevo.
+          fetch-depth: 0
+      - uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: api/package-lock.json
+
+      - name: Instalar dependencias
+        working-directory: api
+        run: npm ci --no-audit --no-fund
+
+      # Sonar no ejecuta las pruebas: consume el LCOV que genera Jest, por eso
+      # la cobertura se regenera aqui.
+      - name: Generar el informe de cobertura
+        working-directory: api
+        run: npm run test:cov
+
+      - name: Analizar y esperar el Quality Gate
+        if: env.SONAR_CONFIGURADO == 'true'
+        uses: SonarSource/sonarqube-scan-action@v6
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+
+      - name: Avisar que el analisis se omitio
+        if: env.SONAR_CONFIGURADO != 'true'
+        run: |
+          echo "::warning::SONAR_TOKEN no configurado. El analisis de SonarQube se omitio."
+          echo "Configure el secreto para activar la puerta de calidad NFR-CAL-3."
+
+  # ===================================================================
+  # 7. Contenedores y escaneo de imagen · NFR-SEG-14
+  # ===================================================================
+  contenedor:
+    name: Construccion de imagenes y escaneo (Trivy)
+    runs-on: ubuntu-latest
+    needs: [lint, pruebas]
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Construir la imagen de la API
+        run: docker build -t cuidarte-api:${{ github.sha }} ./api
+
+      - name: Construir la imagen de la SPA
+        run: docker build -t cuidarte-web:${{ github.sha }} ./web
+
+      # Trivy escanea los paquetes del sistema operativo de la imagen. Las
+      # dependencias de la aplicacion las cubre el job `dependencias`.
+      - name: Escanear la imagen de la API
+        uses: aquasecurity/trivy-action@0.33.1
+        with:
+          image-ref: cuidarte-api:${{ github.sha }}
+          severity: 'CRITICAL,HIGH'
+          vuln-type: 'os'
+          exit-code: '1'
+          ignore-unfixed: true
+
+      - name: Escanear la imagen de la SPA
+        uses: aquasecurity/trivy-action@0.33.1
+        with:
+          image-ref: cuidarte-web:${{ github.sha }}
+          severity: 'CRITICAL,HIGH'
+          vuln-type: 'os'
+          exit-code: '1'
+          ignore-unfixed: true
+
+      # Verificacion explicita de que el contenedor no corre como root: una
+      # ejecucion de codigo arbitrario no debe obtener privilegios.
+      - name: Verificar que la API no corre como root
+        run: |
+          usuario=$(docker run --rm --entrypoint sh cuidarte-api:${{ github.sha }} -c 'id -u')
+          echo "UID del proceso: $usuario"
+          if [ "$usuario" = "0" ]; then
+            echo "::error::La imagen corre como root. Debe usar un usuario sin privilegios."
+            exit 1
+          fi
+
+  # ===================================================================
+  # 8. Seguridad dinamica (DAST) · CP-SEG-08, NFR-SEG-5, NFR-SEG-10
+  # ===================================================================
+  dast:
+    name: Escaneo dinamico (OWASP ZAP)
+    runs-on: ubuntu-latest
+    needs: contenedor
+
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: cuidarte
+          POSTGRES_USER: cuidarte
+          POSTGRES_PASSWORD: clave-solo-para-ci
+        options: >-
+          --health-cmd "pg_isready -U cuidarte"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+        ports:
+          - 5432:5432
+
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: api/package-lock.json
+
+      - name: Instalar dependencias
+        working-directory: api
+        run: npm ci --omit=dev --no-audit --no-fund
+
+      - name: Levantar la API
+        working-directory: api
+        env:
+          NODE_ENV: production
+          PORT: 3000
+          DATABASE_URL: postgresql://cuidarte:clave-solo-para-ci@localhost:5432/cuidarte
+          # Secretos efimeros, validos solo durante esta ejecucion de CI.
+          JWT_SECRET: secreto-efimero-de-integracion-continua-32-caracteres
+          JWT_REFRESH_SECRET: otro-secreto-efimero-de-integracion-continua-32c
+          BCRYPT_COST: 12
+          LOG_LEVEL: warn
+        run: |
+          node src/server.js &
+          echo "Esperando que la API responda..."
+          for intento in $(seq 1 30); do
+            if curl -sf http://localhost:3000/api/v1/salud > /dev/null; then
+              echo "API operativa."
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "::error::La API no respondio en el tiempo esperado."
+          exit 1
+
+      # El escaneo pasivo verifica las cabeceras de seguridad y la ausencia de
+      # fugas de informacion. Las reglas marcadas FAIL en .zap/rules.tsv son
+      # las que corresponden a un requisito del ERS.
+      - name: Escanear con OWASP ZAP (baseline)
+        uses: zaproxy/action-baseline@v0.14.0
+        with:
+          target: 'http://localhost:3000/api/v1/salud'
+          rules_file_name: '.zap/rules.tsv'
+          cmd_options: '-I'
+          fail_action: true
+          allow_issue_writing: false
+
+      - name: Publicar el informe de ZAP como evidencia
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reporte-zap
+          path: |
+            report_html.html
+            report_md.md
+            report_json.json
+          retention-days: 30
+          if-no-files-found: ignore
+
+  # ===================================================================
+  # 9. Resumen · NFR-TRAZ-1
+  # ===================================================================
+  resumen:
+    name: Resumen de las puertas de calidad
+    runs-on: ubuntu-latest
+    if: always()
+    needs: [formato, lint, pruebas, bdd, dependencias, contenedor, dast]
+    steps:
+      - name: Consolidar el resultado
+        run: |
+          {
+            echo "## Puertas de calidad y seguridad · Cuidarte+"
+            echo ""
+            echo "| Control | Requisito | Resultado |"
+            echo "|---|---|---|"
+            echo "| Formato (Prettier) | NFR-CAL-5 | ${{ needs.formato.result }} |"
+            echo "| Analisis estatico (ESLint) | NFR-SEG-5, NFR-USAB-1a3 | ${{ needs.lint.result }} |"
+            echo "| Pruebas y cobertura | NFR-CAL-1 | ${{ needs.pruebas.result }} |"
+            echo "| Escenarios BDD | RB-1, RB-2, RB-3 | ${{ needs.bdd.result }} |"
+            echo "| Dependencias (SCA) | NFR-CAL-4 | ${{ needs.dependencias.result }} |"
+            echo "| Imagenes y Trivy | NFR-SEG-14 | ${{ needs.contenedor.result }} |"
+            echo "| DAST (OWASP ZAP) | NFR-SEG-10 | ${{ needs.dast.result }} |"
+            echo ""
+            echo "Commit: \`${{ github.sha }}\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Fallar si alguna puerta no paso
+        if: ${{ contains(needs.*.result, 'failure') }}
+        run: |
+          echo "::error::Al menos una puerta de calidad o seguridad no paso. Revise el resumen."
+          exit 1
