@@ -1,0 +1,54 @@
+# =====================================================================
+# Cuidarte+ EV2 · archivos excluidos del control de versiones
+# =====================================================================
+
+# --- SECRETOS ---------------------------------------------------------
+# Critico: estos archivos contienen credenciales reales del ambiente QA.
+# Se versiona unicamente .env.example, con los nombres y sin los valores
+# (NFR-SEG-13).
+.env
+.env.*
+!.env.example
+
+# --- Dependencias -----------------------------------------------------
+# 625 MB que se reconstruyen con `npm install` a partir de
+# package-lock.json. El lock SI se versiona: es lo que garantiza que todos
+# instalen las mismas versiones exactas.
+node_modules/
+
+# --- Artefactos de construccion y de analisis -------------------------
+dist/
+coverage/
+reportes/
+.stryker-tmp/
+*.jtl
+report_html.html
+report_md.md
+report_json.json
+
+# --- Datos de ejecucion -----------------------------------------------
+# El storage interno de documentos clinicos: son datos, no codigo.
+storage-documentos/
+*.log
+
+# --- Documentos exportados --------------------------------------------
+# Los .docx se generan desde docs/*.md con entrega/exportar-a-word.py.
+# Son binarios: no se pueden revisar en un diff y se regeneran en un
+# segundo. Se versiona el conversor, que si es codigo fuente.
+entrega/*.docx
+entrega/*.pdf
+
+# --- Temporales del generador de la version auditada -------------------
+.reserva-node-modules/
+
+# --- Configuracion local del entorno de trabajo -----------------------
+.vscode/
+.idea/
+*.sublime-*
+*.swp
+*~
+
+# --- Sistema operativo -------------------------------------------------
+.DS_Store
+Thumbs.db
+desktop.ini
